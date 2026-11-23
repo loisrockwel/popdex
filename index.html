@@ -497,8 +497,8 @@ async function prepareCD(filter){
   throw err;
 }
 // Chance d'obtenir un NOUVEL album (quand la star tirée a à la fois des albums possédés et des nouveaux), selon l'avancement de ta collection
-// (part des albums du jeu que tu possèdes) : 10 % → 1 %, 25 % → 3 %, 50 % → 5 %, 75 % → 10 %, 90 % → 20 %. Entre deux points : une droite.
-const NEW_CURVE=[[0,0.01],[0.10,0.01],[0.25,0.03],[0.50,0.05],[0.75,0.10],[0.90,0.20],[1,0.20]];
+// (part des albums du jeu que tu possèdes) : 10 % → 0,01 %, 25 % → 1 %, 50 % → 10 %, 75 % → 20 %, 90 % → 50 %. Entre deux points : une droite.
+const NEW_CURVE=[[0,0.0001],[0.10,0.0001],[0.25,0.01],[0.50,0.10],[0.75,0.20],[0.90,0.50],[1,0.50]];
 function newTarget(){
   const tot=LIB.albums?Object.keys(LIB.albums).length:700,f=Math.min(1,Object.keys(db).length/tot);
   for(let i=1;i<NEW_CURVE.length;i++){const [f1,p1]=NEW_CURVE[i-1],[f2,p2]=NEW_CURVE[i];if(f<=f2)return p1+(p2-p1)*(f-f1)/(f2-f1)}
