@@ -790,7 +790,7 @@ async function bonusFX(k,fast){
 }
 function fxClear(){document.querySelectorAll(".bonusfx,.spark").forEach(e=>e.remove())}
 /* ---------- MODE CHOIX : 2 CD, on en garde un (15 pièces) ---------- */
-const RANK_PRICE=15,CHAOS_PRICE=30; // Choix : 2 CD pour 15 pièces · Chaos : 4 CD pour 30 pièces, +2 chansons offertes
+const RANK_PRICE=15,CHAOS_PRICE=40; // Choix : 2 CD pour 15 pièces · Chaos : 4 CD pour 40 pièces, +2 chansons offertes
 let rank=meta.rankPending||null; // {A,B} : les deux tirages en attente de choix (gardés même si on recharge la page)
 async function buyMulti(count,price,extra,mode){
   if(buying||rank||meta.coins<price||(pending&&!pending.done))return;
