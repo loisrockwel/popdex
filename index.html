@@ -266,6 +266,50 @@ body.shake2{animation:bodyshake .55s 3}
 .cdwrap.bonus .tray{animation:bonusring 1s ease-out 3}
 @keyframes bonusring{0%{box-shadow:0 0 0 0 #ffd75e,0 10px 30px #0006}70%{box-shadow:0 0 0 38px #ffd75e00,0 0 70px #ffd75e}100%{box-shadow:0 10px 30px #0006}}
 .bonustag{background:linear-gradient(90deg,#f6dc7a,#c8961a);color:#2a1b00;border-radius:6px;padding:1px 7px;font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
+
+/* mode Ranking */
+.cta{display:flex;gap:10px;align-items:stretch}
+.cta .btn.big{flex:1;margin:0;flex-direction:column;justify-content:center;gap:5px;padding:13px 8px;font-size:15px;line-height:1.2;min-width:0;text-align:center}
+.btn.rank{background:linear-gradient(135deg,#7a3dff,#ff3d9a)}
+.btn.rank small{font-size:11px;font-weight:600;opacity:.9}
+.btn.rank .pr{margin-left:10px}
+.stage:empty{display:none}
+.rkinfo{margin:14px 0 6px;font-weight:800;font-size:18px;text-align:center}
+.rkgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.rkcard{background:var(--card);border-radius:18px;padding:10px;min-width:0;display:flex;flex-direction:column}
+.rkcov .cov{width:100%;border-radius:12px}
+.rkt{font-size:16px;font-weight:800;letter-spacing:-.3px;line-height:1.15;margin-top:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rkart{font-size:12.5px;color:var(--mut);margin:2px 0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rkbadges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.rkbadges .new{background:var(--acc);color:#fff;border-radius:6px;padding:2px 7px;font-size:10px;font-weight:800;letter-spacing:.3px;text-transform:uppercase}
+.rkbadges .old{color:var(--mut);font-size:11px;font-weight:600;align-self:center}
+.rkprog{margin-top:auto;padding-bottom:6px}.rkprog .row b{font-size:14px}
+.rkcard .btn.big{width:100%;margin-top:8px;padding:12px 6px;font-size:14px}
+
+/* ---------- TOURNOI (ranking d'une playlist) ---------- */
+.tourhead{display:flex;justify-content:space-between;align-items:baseline;margin:10px 0 4px}
+.tourhead b{font-size:22px;letter-spacing:-.4px}.tourhead span{color:var(--mut);font-size:13px;font-weight:600}
+.duel{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 8px;position:relative;animation:fadein .25s}
+.vs{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);z-index:3;background:var(--acc);color:#fff;font-weight:900;font-size:14px;letter-spacing:1px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;box-shadow:0 0 0 4px var(--bg)}
+.dcard{background:var(--card);border:2px solid transparent;border-radius:20px;padding:12px;text-align:center;cursor:pointer;color:var(--ink);font-family:inherit;min-width:0;transition:transform .15s,border-color .15s,box-shadow .15s}
+.dcard:hover,.dcard:active{border-color:var(--acc);transform:translateY(-3px) scale(1.01);box-shadow:0 10px 26px #0004}
+.dcard .cov{width:100%;border-radius:12px}
+.dcard b{display:block;margin-top:10px;font-size:16px;line-height:1.2;letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.dcard .sub{display:block;font-size:12.5px;color:var(--mut);margin:3px 0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tourwin{text-align:center;margin:10px 0 6px}
+.tourwin .crown{font-size:12px;letter-spacing:5px;font-weight:800;color:#d4a017;text-transform:uppercase;margin-bottom:12px}
+.tourwin .frame{max-width:300px;margin:0 auto}
+.tourwin h3{margin:16px 0 2px;font-size:26px;letter-spacing:-.6px;line-height:1.1}
+.rkrow{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);min-width:0}
+.rkrow .rk{width:34px;text-align:center;font-weight:900;font-size:16px;flex:none;color:var(--mut)}
+.rkrow:nth-child(-n+4) .rk{color:#d4a017}
+.rkrow .cov{width:44px;flex:none;border-radius:6px}.rkrow .x{flex:1;min-width:0}
+.rkrow .x b{display:block;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rkrow .x span{display:block;font-size:12px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tourimg{margin:14px 0;text-align:center}.tourimg img{width:100%;max-width:420px;border-radius:16px;box-shadow:0 10px 36px #0006}
+.opt{display:flex;gap:10px;align-items:flex-start;background:var(--card);border-radius:14px;padding:12px;margin:8px 0;cursor:pointer}
+.opt input{width:auto;margin-top:3px}
+.opt b{display:block;font-size:15px}.opt span{font-size:12.5px;color:var(--mut)}
 </style>
 </head>
 <body>
@@ -286,7 +330,7 @@ const RN=["Bronze","Argent","Or","Diamant","Platine"];
 const SONG_T=/*SONG_T*/[10e6,100e6,500e6,1e9]/*E*/,ALB_T=/*ALB_T*/[400e6,1.5e9,4e9,10e9]/*E*/;
 // nombre de chansons par CD : 2 de base ; une 3e chanson 1 fois sur 10, 4 chansons 1 fois sur 100, 5 sur 1 000, 6 sur 10 000
 function songsInCD(){const u=Math.random();return u<1e-4?6:u<1e-3?5:u<1e-2?4:u<1e-1?3:2}
-const DUPC=[1,2,4,8,20],PRICE=10,REGEN_MS=60000,REGEN_COINS=2,MAXFREE=30;
+const DUPC=[1,2,4,8,20],PRICE=10,START_COINS=100,REGEN_MS=3600000,REGEN_COINS=5,MAXFREE=100; // 100 pièces au départ ; +5 pièces par heure, jusqu'à 100
 const rar=(n,T)=>T.filter(x=>n>=x).length;
 const ROSTER=/*ROSTER*/[["Taylor Swift", "20244d07-534f-4eff-b4d4-930878889970"], ["Ariana Grande", "f4fdbb4c-e4b7-47a0-b83b-d91bbfcfa387"], ["Dua Lipa", "6f1a58bf-9b1b-49cf-a44a-6cefad7ae04f"], ["Billie Eilish", "f4abc0b5-3f7a-4eff-8f78-ac078dbce533"], ["Olivia Rodrigo", "6925db17-f35e-42f3-a4eb-84ee6bf5d4b0"], ["Sabrina Carpenter", "1882fe91-cdd9-49c9-9956-8e06a3810bd4"], ["Rihanna", "73e5e69d-3554-40d8-8516-00cb38737a1c"], ["Beyoncé", "859d0860-d480-4efd-970c-c05d5f1776b8"], ["Lady Gaga", "650e7db6-b795-4eb5-a702-5ea2fc46c848"], ["Katy Perry", "122d63fc-8671-43e4-9752-34e846d62a9c"], ["Miley Cyrus", "7e9bd05a-117f-4cce-87bc-e011527a8b18"], ["Selena Gomez", "e4bc69e2-a064-4f93-ada1-f7f209cc1cc3"], ["Britney Spears", "45a663b5-b1cb-4a91-bff6-2bef7bbfdd76"], ["Shakira", "bf24ca37-25f4-4e34-9aec-460b94364cfc"], ["Adele", "cc2c9c3c-b7bc-4b8b-84d8-4fbd8779e493"], ["Lana Del Rey", "b7539c32-53e7-4908-bda3-81449c367da6"], ["Charli XCX", "260b6184-8828-48eb-945c-bc4cb6fc34ca"], ["Doja Cat", "5df62a88-cac9-490a-b62c-c7c88f4020f4"], ["Madonna", "79239441-bfd5-4981-a70c-55c3f15c1287"], ["Kylie Minogue", "2fddb92d-24b2-46a5-bf28-3aed46f4684c"], ["Chappell Roan", "56a55378-f155-48de-80a5-d80104221267"], ["Lorde", "8e494408-8620-4c6a-82c2-c2ca4a1e4f12"], ["Sia", "2f548675-008d-4332-876c-108b0c7ab9c5"], ["Halsey", "3377f3bb-60fc-4403-aea9-7e800612e060", "Halsey (singer)"], ["Nicki Minaj", "1036b808-f58c-4a3e-b461-a2c4492ecf1b"], ["Cardi B", "2f3c4d70-0462-40da-bba3-0aec5772c556"], ["Megan Thee Stallion", "ee27b2d8-648c-4a9d-a68c-e55066959975"], ["Lizzo", "8fb5370b-9568-4b61-9da5-2aa12c9928db"], ["SZA", "272989c8-5535-492d-a25c-9f58803e027f"], ["Rosalía", "25f3abd9-63b5-471a-bd25-feb9672dfa11"], ["Camila Cabello", "01b8b5bf-06cb-45da-85fb-61ada72fcd69"], ["Christina Aguilera", "b202beb7-99bd-47e7-8b72-195c8d72ebdd"], ["Jennifer Lopez", "f0602f55-1770-483d-89bd-4bae0d0ac086"], ["Mariah Carey", "494e8d09-f85b-4543-892f-a5096aed1cd4"], ["Whitney Houston", "0307edfc-437c-4b48-8700-80680e66a228"], ["Cher", "bfcc6d75-a6a5-4bc6-8282-47aec8531818"], ["Janet Jackson", "6be2828f-6c0d-4059-99d4-fa18acf1a296"], ["Kesha", "fab34286-b8e1-4879-bce3-194e1358fbd2"], ["P!nk", "f4d5cc07-3bc9-4836-9b15-88a08359bc63"], ["Avril Lavigne", "0103c1cc-4a09-4a5d-a344-56ad99a77193"], ["Gwen Stefani", "2e41ae9c-afd2-4f20-8f1e-17281ce9b472"], ["Tate McRae", "f9133869-f87c-459c-9aa7-2f176cda7e06"], ["Gracie Abrams", "f7441bc7-d7de-4813-a2fc-31a4033d396d"], ["Reneé Rapp", "e4378b7a-6138-441a-aa34-50e11a562066"], ["Ice Spice", "6f2c949d-9540-4421-bf02-27ae27e00e33"], ["Raye", "8be564c3-dfba-440b-af8c-4ffbceeef45e"], ["Lola Young", "43b896c5-5652-4b04-bde1-2e4224bc99b3"], ["Ellie Goulding", "33ca19f4-18c8-4411-98df-ac23890ce9f5"], ["Robyn", "5a8e07d5-d932-4484-a7f7-e700793a9c94"], ["Carly Rae Jepsen", "09887aa7-226e-4ecc-9a0c-02d2ae5777e1"], ["Kim Petras", "54fc0558-12b5-4854-9d57-9441bcd73a72"], ["Slayyyter", "9058d01e-8afc-47a4-8664-621fb5f159c0"], ["Caroline Polachek", "d8f43dc5-4613-48ac-8c23-a62b82f8c67a"], ["Weyes Blood", "469d6414-1f06-43de-80d5-17762d4a356a"], ["Tove Lo", "56756959-1e78-429c-b897-e1d056cb0225"], ["MARINA", "7f3d82ee-3817-4367-9eec-f33a312247a1", "Marina Diamandis"], ["Mitski", "fa58cf24-0e44-421d-8519-8bf461dcfaa5"], ["Sky Ferreira", "05f3353e-e2d9-4344-a3c9-8009dd8e0427"], ["Grimes", "7e5a2a59-6d9f-4a17-b7c2-e1eedb7bd222"], ["FKA twigs", "1e4e9db7-5068-4a9c-bdd0-5777e47172c8"], ["Zara Larsson", "134e6410-6954-45d1-bd4a-0f2d2ad5471d"], ["Ava Max", "add5f522-25df-41c4-815e-0ca9f60b83e4"], ["Anitta", "d606b860-cc03-4959-a3fd-3a24bccf2560", "Anitta (singer)"], ["Karol G", "de22adae-f8ac-414f-b653-b0162611bd60"], ["Bebe Rexha", "db8fad3a-e131-47a1-8782-c2ee93708cdd"], ["Meghan Trainor", "b2029169-2574-4305-820f-252a5fde3697"], ["Normani", "04d93730-f81c-450c-8441-d5f5fcf98485"], ["Jessie J", "d24fb461-dee8-41fc-bb15-2f13bb2644a6"], ["Amy Winehouse", "dfe9a7c4-8cf2-47f4-9dcb-d233c2b86ec3"], ["Kate Bush", "4b585938-f271-45e2-b19a-91c634b5e396"], ["Björk", "87c5dedd-371d-4a53-9f7f-80522fb7f3cb"], ["Alanis Morissette", "4bdcee62-4902-4773-8cd1-e252e2e31225"], ["Olivia Dean", "15e0d608-0869-429b-898d-3d8db3ecedd5"], ["Laufey", "21a89505-10a9-4ac0-8388-833bc07b9f86", "Laufey (singer)"], ["Clairo", "d786f59b-1836-4ddb-8393-ab753edbe984"], ["Lizzy McAlpine", "ee0b11de-0c8a-4267-9886-198f4579e1db"], ["Phoebe Bridgers", "96855c21-b832-4366-ba12-0d2330c36a86"], ["Fiona Apple", "a9ee533f-8871-4f62-a6bb-91eb264abc90"], ["St. Vincent", "5334edc0-5faf-4ca5-b1df-000de3e1f752", "St. Vincent (musician)"], ["Nelly Furtado", "13655113-cd16-4b43-9dca-cadbbf26ee05"], ["Rina Sawayama", "52494f9b-789d-4467-bcaf-9915e70cc8f6"], ["Jessie Ware", "6ed40778-8d03-4a5c-ad35-93cf814627c9"], ["Demi Lovato", "faf4cefb-036c-4c88-b93a-5b03dd0a0e6b"], ["Ashnikko", "6dee6b6f-aa72-424c-9c8c-0d31ba5ff673"], ["Janelle Monáe", "ee190f6b-7d98-43ec-b924-da5f8018eca0"], ["Addison Rae", "610b71d9-fa78-47d6-9073-083922e73840"], ["Oklou", "13e2db47-3010-48b8-a8b9-667551f37119"], ["Tinashe", "396a9525-0994-4542-b480-c4587feeb476"], ["Dolly Parton", "1d543e07-d0d2-4834-a8db-d65c50c2a856"], ["Madison Beer", "749ef494-8518-4b49-b685-63d8e728d25c"], ["PinkPantheress", "7441014f-f8f5-494f-81db-ff166fbc078d"], ["Kali Uchis", "d0c7656d-8169-4f77-9dbe-b8f24e40105d"], ["Chloe x Halle", "65dc16f0-2573-4747-ae7b-a7a2ff4dab8f"], ["Eartheater", "7f5a2d26-8625-4788-bafd-0034936895ae"], ["Ethel Cain", "677e31f1-4035-463c-8ca4-41175440c919"], ["Florence + the Machine", "5fee3020-513b-48c2-b1f7-4681b01db0c6", "Florence and the Machine"], ["Iggy Azalea", "3a052c99-8c18-484a-8beb-9873b4fb3106"], ["Jhené Aiko", "ceb3f5b7-9f1a-430f-afbe-976fdcf30482"], ["Kacey Musgraves", "d1393ecb-431b-4fde-a6ea-d769f2f040cb"], ["Julia Michaels", "4757df70-6c3e-46b8-99c0-a68644595c9a"], ["Kehlani", "3260ce89-5eb0-4c6a-89c7-379c0dfc2ab9"], ["Lily Allen", "6e0c7c0e-cba5-4c2c-a652-38f71ef5785d"], ["Little Mix", "38f59974-2f4d-4bfa-b2e3-d2696de1b675"], ["Mazzy Star", "c48d4327-8122-4286-af66-05e1ee6ac4d8"], ["Melanie Martinez", "0df563ec-1a79-486e-a46d-5b9862a40311"], ["Ninajirachi", "6897b46a-9236-4480-9ed7-300f6b85d62f"], ["Paramore", "44cf61b8-5197-448a-b82b-cef6ee89fac5"], ["Rebecca Black", "312c7cc1-9b5c-4406-963b-9f73f50674c0"], ["Rita Ora", "c9dd033c-0270-463c-b3ec-f4b7712486fe"], ["Rose Gray", "32a49e9e-2434-49ab-9194-3985d757de40", "Rose Gray (singer)"], ["Summer Walker", "9167f739-da47-4495-9d63-9c13b40114ac"], ["Zella Day", "84f246f7-663b-40cf-a66f-336e8b314836"], ["Alicia Keys", "8ef1df30-ae4f-4dbd-9351-1a32b208a01e"], ["Anne-Marie", "e3d5b5ec-101a-4529-9f2d-01dca64cf44e", "Anne-Marie (singer)"], ["Kelly Clarkson", "d339efbb-77b9-4147-ba9e-59f2f24550b2"], ["Hailee Steinfeld", "373f5bcf-f1ce-4515-83ed-0b8ed636bc14"], ["Dido", "d1353a0c-26fb-4318-a116-defde9c7c9ad", "Dido (singer)"], ["Leona Lewis", "8d552dfc-648f-401f-90de-e925013ca537"], ["Mabel", "3a592f93-5c88-4b7c-a10f-8eb3dcbadde7", "Mabel (singer)"], ["Natasha Bedingfield", "8b477559-946e-4ef2-9fe1-446cff8fdd79"], ["Sophie Ellis-Bextor", "c4b87e45-c07a-460f-9c58-8d15328e2964"], ["Cheryl", "2d499150-1c42-4ffb-a90c-1cc635519d33", "Cheryl (singer)"], ["Becky G", "eb90c8b8-d733-4c14-a293-105c3d1ba9b3", "Becky G"], ["Willow", "6bbfc71b-5f18-4e61-82fb-bee0c2a6b5f9", "Willow Smith"], ["Aaliyah", "bc85da58-52d9-457d-ae8d-5d8d4ec870a9"], ["Mary J. Blige", "db76c5ca-d555-4f09-b1db-baa1b713d875"], ["Shania Twain", "faabb55d-3c9e-4c23-8779-732ac2ee2c0d"], ["Stevie Nicks", "b7f2cca2-72c6-41fb-ae33-53370fc62fe7", "Stevie Nicks"], ["Tina Turner", "9072df14-b61e-42e2-b4f4-6bbb7fdb5586"], ["Donna Summer", "b60527cc-54f3-4bbe-a01b-dcf34c95ae14"], ["Cyndi Lauper", "7bd9e20e-74b9-446a-a2ed-a223f82a36e7"], ["Destiny's Child", "a796b92e-c137-4895-9c89-10f900617a4f"], ["Spice Girls", "bf0caafc-2b20-4e07-ab85-87e14ff430ce"], ["TLC", "99790314-885a-4975-8614-9c5bc890364d", "TLC (group)"], ["Fifth Harmony", "e565610b-9a8f-451d-b594-ea658d76f725"], ["Girls Aloud", "a0b2f210-cd3a-453d-937d-e4f2658d17c7"], ["The Pussycat Dolls", "1fda852b-92e9-4562-82fa-c52820a77b23"], ["HAIM", "aef06569-098f-4218-a577-b413944d9493", "Haim (band)"], ["Doechii", "9f75277c-b283-4846-ac8c-f932255cd0ac"], ["Tyla", "45425c84-9092-4e2c-b732-e1d0280b580a", "Tyla (singer)"], ["Tems", "5b2a8faa-ffee-4706-a1a8-58f109bc8ca2", "Tems"], ["Victoria Monét", "28d83274-26ab-4a6a-b9ff-340f4784e7dd"], ["Latto", "355cc194-b8db-4af2-8678-c7ad54213f4b"], ["Saweetie", "72d424d0-c349-4164-ae3e-8e5274f97b98"], ["Jorja Smith", "d62614aa-ef2c-44cd-8a7b-91292755a1d0"], ["Ella Mai", "89d42b97-8042-4c14-a596-a2ccaef5fc4c"], ["Ayra Starr", "c4ac4b97-2eac-46f6-85ae-f916c93847e4"], ["Beabadoobee", "88d17133-abbc-42db-9526-4e2c1db60336"], ["girl in red", "4ae429fe-735c-4968-8253-a591421b1bd0", "Girl in Red"], ["Wet Leg", "90744b3e-363a-458e-8da1-e3e392a489c4"], ["Maisie Peters", "c2f6c57f-27ba-4c0d-b2fd-3348961e79a1"], ["Holly Humberstone", "736c8ea9-b5c3-4c5f-8782-28e633f0c084"], ["Lucy Dacus", "dbe7fdf7-81b2-418b-b3f6-81ae71532f40"], ["Shygirl", "9385f1a7-8623-4d0c-b171-f1e6e87220c5"], ["Yeule", "31da7b06-bc30-4a1f-9f4a-c2ac1a84167f"], ["SOPHIE", "774b02d7-5056-4b0f-9d69-a82b6ae27cde", "Sophie (musician)"], ["Allie X", "7c922f2c-9d2b-4f37-a139-cddb83722ab3"], ["Kelela", "045494aa-e913-4e62-bf4e-dcc276e0075a"]]/*E*/; // [name, mbid, wikiTitle?]
 // albums exclus à la main : [artiste, titre normalisé] (autoproduits, retirés, jamais sortis…)
@@ -300,11 +344,11 @@ const MEN=["Harry Styles","Ed Sheeran","Justin Bieber","The Weeknd","Bruno Mars"
 const ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}};
 const st=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 ["popdex_roster","popdex_albums","popdex_tracks","popdex_custom2","popdex_albums2","popdex_albums3","popdex_albums4","popdex_albums5","popdex_tracks3","popdex_recs2","popdex_tracks2"].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
-let db=ld("popdex",{}),meta=Object.assign({coins:30,t:Date.now()},ld("popdex_meta",{}));
+let db=ld("popdex",{}),meta=Object.assign({coins:START_COINS,t:Date.now()},ld("popdex_meta",{}));
 let custom=[],albumsC=ld("popdex_albums6",{}),tracksC=ld("popdex_tracks4",{}),photos=ld("popdex_photos2",{});
 Object.keys(db).forEach(k=>{if(MEN.includes(db[k].artist)||db[k].kind!="Album"||!db[k].sc||(db[k].tracks.length<=3&&["63eba062-847c-3b73-8b0f-6baf27bba6fa","2ae2e504-7116-4b4f-b632-9748bb18ccd2"].includes(k)))delete db[k]});
 const DEV=["localhost","127.0.0.1",""].includes(location.hostname); // les raccourcis ?coins= et ?reset= ne marchent qu'en local (pas sur le site public)
-try{if(DEV&&new URLSearchParams(location.search).has("reset")){["popdex","popdex_meta"].forEach(k=>localStorage.removeItem(k));db={};meta={coins:30,t:Date.now()};history.replaceState(null,"",location.pathname)}}catch(e){}
+try{if(DEV&&new URLSearchParams(location.search).has("reset")){["popdex","popdex_meta"].forEach(k=>localStorage.removeItem(k));db={};meta={coins:START_COINS,t:Date.now()};history.replaceState(null,"",location.pathname)}}catch(e){}
 try{const q=DEV?new URLSearchParams(location.search).get("coins"):null;if(q&&+q>0){meta.coins=Math.min(+q,100000);st("popdex_meta",meta);history.replaceState(null,"",location.pathname)}}catch(e){}
 const roster=()=>ROSTER.map(r=>({name:r[0],id:r[1],wiki:r[2]})); // liste fermée : on ne peut pas ajouter de star
 const save=()=>{st("popdex",db);st("popdex_meta",meta)};
@@ -497,8 +541,8 @@ async function prepareCD(filter){
   throw err;
 }
 // Chance d'obtenir un NOUVEL album (quand la star tirée a à la fois des albums possédés et des nouveaux), selon l'avancement de ta collection
-// (part des albums du jeu que tu possèdes) : 10 % → 0,01 %, 25 % → 1 %, 50 % → 10 %, 75 % → 20 %, 90 % → 50 %. Entre deux points : une droite.
-const NEW_CURVE=[[0,0.0001],[0.10,0.0001],[0.25,0.01],[0.50,0.10],[0.75,0.20],[0.90,0.50],[1,0.50]];
+// (part des albums du jeu que tu possèdes) : 10 % → 0,005 %, 25 % → 0,5 %, 50 % → 5 %, 75 % → 10 %, 90 % → 25 %. Entre deux points : une droite.
+const NEW_CURVE=[[0,0.00005],[0.10,0.00005],[0.25,0.005],[0.50,0.05],[0.75,0.10],[0.90,0.25],[1,0.25]];
 function newTarget(){
   const tot=LIB.albums?Object.keys(LIB.albums).length:700,f=Math.min(1,Object.keys(db).length/tot);
   for(let i=1;i<NEW_CURVE.length;i++){const [f1,p1]=NEW_CURVE[i-1],[f2,p2]=NEW_CURVE[i];if(f<=f2)return p1+(p2-p1)*(f-f1)/(f2-f1)}
@@ -522,30 +566,26 @@ function renderPack(){
   artist="*";
   app.innerHTML=`<h1 class="pt">Ouvrir un CD</h1>
   <div class="stage" id="stage"></div><div id="res2"></div>
-  <div class="cta"><button class="btn big" id="open"></button></div>
+  <div class="cta"><button class="btn big" id="open"></button><button class="btn big rank" id="rank"></button></div>
   <details class="info"><summary>Comment ça marche</summary>
   <p>Un CD coûte ${PRICE} pièces et contient <b>2 chansons</b> du même album, d’une popstar tirée au hasard (toutes ont la même chance, tu ne choisis pas). Parfois, un CD bonus en contient plus : <b>3</b> (1 chance sur 10), <b>4</b> (1 sur 100), <b>5</b> (1 sur 1 000) ou <b>6</b> (1 sur 10 000).</p>
   <p>La rareté d’une chanson ou d’un album dépend de ses streams Spotify cumulés (données Kworb) : ${RN.map((n,i)=>`<span class="pill r${i}">${n}</span>`).join(" ")}</p>
   <p>Au début, tu retombes souvent sur les albums que tu as déjà. Plus ta collection avance, plus les <b>nouveaux albums</b> deviennent fréquents.</p>
-  <p>Doublon : +${DUPC.join(" / +")} pièces selon la rareté. Album complété : +50. Pièces offertes : +${REGEN_COINS} par minute jusqu’à ${MAXFREE}.</p></details>`;
-  document.getElementById("open").onclick=buyCD;
+  <p><b>Mode Choix</b> (${RANK_PRICE} pièces) : le jeu prépare <b>2 CD différents</b>. Tu vois l’album, la popstar, si c’est une nouveauté et où tu en es dans l’album, mais pas les chansons : tu en gardes un seul, puis il s’ouvre. Le résultat dans ta collection est le même qu’avec un CD classique.</p>
+  <p>Doublon : +${DUPC.join(" / +")} pièces selon la rareté. Album complété : +50. Pièces offertes : tu démarres avec ${START_COINS}, puis +${REGEN_COINS} par heure (jusqu’à ${MAXFREE}).</p></details>`;
+  document.getElementById("open").onclick=buyCD;document.getElementById("rank").onclick=buyRanking;
   updPackBtn();prefetch();
-  if(pending&&!pending.done)showSealed();else if(lastRes)showResult(lastRes);else document.getElementById("stage").innerHTML='<div class="mut idle">Ouvre un CD scellé pour découvrir<br>une popstar, un album et 2 chansons.</div>';
+  if(rank)showRank();else if(pending&&!pending.done)showSealed();else if(lastRes)showResult(lastRes);else document.getElementById("stage").innerHTML='<div class="mut idle">Ouvre un CD scellé pour découvrir<br>une popstar, un album et 2 chansons.</div>';
 }
 function updPackBtn(){const b=document.getElementById("open");if(!b)return;
-  b.disabled=buying||(!!pending&&!pending.done)||meta.coins<PRICE;
+  const rb=document.getElementById("rank");
+  if(rb){rb.disabled=buying||!!rank||(!!pending&&!pending.done)||meta.coins<RANK_PRICE;rb.innerHTML=rank?"Choisis un CD":buying?"Fabrication…":`Mode Choix<span class="pr"><i class="coin"></i>${RANK_PRICE}</span><small>2 CD, tu en gardes 1</small>`}
+  b.disabled=buying||!!rank||(!!pending&&!pending.done)||meta.coins<PRICE;
   b.innerHTML=buying?"Fabrication du CD…":pending&&!pending.done?"Touche le CD pour l’ouvrir":meta.coins<PRICE?"Pas assez de pièces":`Acheter un CD<span class="pr"><i class="coin"></i>${PRICE}</span>`}
-async function buyCD(){
-  if(buying||meta.coins<PRICE||(pending&&!pending.done))return;
-  buying=true;lastRes=null;meta.coins-=PRICE;regen();updPackBtn();
-  document.getElementById("stage").innerHTML='<div class="mut idle">Le CD sort de l’usine…<br>la première fois peut prendre quelques secondes.</div>';document.getElementById("res2").innerHTML="";
-  let cd;
-  try{prefetch();cd=await ready.promise;ready=null;if(albumDone(cd.rg)){prefetch();cd=await ready.promise;ready=null}}
-  catch(e){meta.coins+=PRICE;ready=null;buying=false;regen();updPackBtn();document.getElementById("stage").innerHTML=e.message=="COLLECTION_COMPLETE"?'<div class="mut idle"><b>Bravo !</b><br>Tu as complété tous les albums du jeu.<br>Pièces remboursées.</div>':'<div class="mut idle">Impossible de joindre les bases musicales ('+esc(e.message)+').<br>Pièces remboursées, réessaie.</div>';return}
-  buying=false;
-  const ar=rar(cd.n,ALB_T);
-  let d=db[cd.rg];const isNew=!d;
-  if(!d)d={artist:cd.artist,aid:cd.aid,title:cd.title,year:cd.year,kind:cd.kind,n:cd.n,tracks:cd.tracks,sc:cd.sc,got:[]};
+// Tirage d'un CD, calculé sans rien modifier : l'album, les chansons obtenues, les doublons, la complétion…
+function rollCD(cd){
+  const ar=rar(cd.n,ALB_T),ex=db[cd.rg],isNew=!ex;
+  const d=ex?{...ex,got:ex.got.slice(),tracks:ex.tracks.slice(),sc:(ex.sc||[]).slice()}:{artist:cd.artist,aid:cd.aid,title:cd.title,year:cd.year,kind:cd.kind,n:cd.n,tracks:cd.tracks,sc:cd.sc,got:[]};
   if(d.tracks.length!=cd.tracks.length||d.tracks.some((t,i)=>norm(t)!=norm(cd.tracks[i]))){
     const have=d.got.map(i=>norm(d.tracks[i]));
     d.tracks=cd.tracks;d.got=cd.tracks.map((t,i)=>have.includes(norm(t))?i:-1).filter(i=>i>=0);d.sc=cd.sc;
@@ -556,13 +596,29 @@ async function buyCD(){
   const fresh=d.tracks.map((_,i)=>i).filter(i=>!d.got.includes(i)&&!idx.includes(i));
   const dupAt=()=>idx.map((x,p)=>d.got.includes(x)?p:-1).filter(p=>p>=0);
   while(idx.length>1&&dupAt().length>1&&fresh.length){const ps=dupAt();idx[ps[Math.floor(Math.random()*ps.length)]]=fresh.splice(Math.floor(Math.random()*fresh.length),1)[0]}
-  const before=d.got.length;
-  const pulls=idx.map(i=>{const dup=d.got.includes(i),sr=rar(d.sc[i]||0,SONG_T);if(dup)meta.coins+=DUPC[sr];else d.got.push(i);return{i,t:d.tracks[i],dup,sr,n:d.sc[i]||0}});
-  db[cd.rg]=d;
-  const complete=before<d.tracks.length&&d.got.length==d.tracks.length;let bonus=0;if(complete){meta.coins+=50;bonus=50}
+  const pulls=idx.map(i=>{const dup=d.got.includes(i),sr=rar(d.sc[i]||0,SONG_T);return{i,t:d.tracks[i],dup,sr,n:d.sc[i]||0}});
+  const before=d.got.length,after=before+pulls.filter(p=>!p.dup).length;
+  const complete=before<d.tracks.length&&after==d.tracks.length;
   const firstArtist=isNew&&!Object.entries(db).some(([k,x])=>k!=cd.rg&&x.artist==d.artist);
-  pending={id:cd.rg,ar,pulls,complete,bonus,isNew,firstArtist,done:false};
-  save();regen();showSealed();beep(330,.08);updPackBtn();prefetch();ensurePhotos([d.artist]);
+  return{id:cd.rg,d,ar,pulls,complete,bonus:complete?50:0,isNew,firstArtist,before,after,done:false};
+}
+// Applique un tirage à la collection et aux pièces (le CD choisi, en mode Ranking)
+function applyRoll(R){
+  const d=R.d;
+  R.pulls.forEach(p=>{if(p.dup)meta.coins+=DUPC[p.sr];else if(!d.got.includes(p.i))d.got.push(p.i)});
+  if(R.complete)meta.coins+=R.bonus;
+  db[R.id]=d;
+}
+async function buyCD(){
+  if(buying||rank||meta.coins<PRICE||(pending&&!pending.done))return;
+  buying=true;lastRes=null;meta.coins-=PRICE;regen();updPackBtn();
+  document.getElementById("stage").innerHTML='<div class="mut idle">Le CD sort de l’usine…<br>la première fois peut prendre quelques secondes.</div>';document.getElementById("res2").innerHTML="";
+  let cd;
+  try{prefetch();cd=await ready.promise;ready=null;if(albumDone(cd.rg)){prefetch();cd=await ready.promise;ready=null}}
+  catch(e){meta.coins+=PRICE;ready=null;buying=false;regen();updPackBtn();document.getElementById("stage").innerHTML=e.message=="COLLECTION_COMPLETE"?'<div class="mut idle"><b>Bravo !</b><br>Tu as complété tous les albums du jeu.<br>Pièces remboursées.</div>':'<div class="mut idle">Impossible de joindre les bases musicales ('+esc(e.message)+').<br>Pièces remboursées, réessaie.</div>';return}
+  buying=false;
+  const R=rollCD(cd);applyRoll(R);pending=R;
+  save();regen();showSealed();beep(330,.08);updPackBtn();prefetch();ensurePhotos([R.d.artist]);
 }
 function cdHTML(rg,title,sealed,isNew){return`<div class="cdwrap${isNew?" newalb":""}" id="cd" style="--h:${hue(title)}"><div class="tray" id="tray" data-t="${esc(title)}" style="background-image:url(${COVER(rg)})"></div><img src="${COVER(rg)}" alt="" style="display:none" onerror="this.parentNode.classList.add('nocov')"><div class="disc" id="disc"></div>${isNew?'<div class="ribbon">Nouvel album</div>':""}<div class="lid"><span>?</span></div>${sealed?'<div class="wrap">Touche pour ouvrir</div>':""}</div><div class="tier" id="tier"></div>`}
 function showSealed(){const d=db[pending.id];document.getElementById("stage").innerHTML=cdHTML(pending.id,d.title,true,pending.isNew);document.getElementById("res2").innerHTML="";const cd=document.getElementById("cd");cd.onclick=()=>tear(cd)}
@@ -632,6 +688,45 @@ async function bonusFX(k){
   if(k>=5){document.body.classList.add(k>=6?"shake2":"shake");setTimeout(()=>document.body.classList.remove("shake","shake2"),k>=6?1800:600)}
   await sleep(cfg.d*1000);fx.remove();
 }
+/* ---------- MODE CHOIX : 2 CD, on en garde un (15 pièces) ---------- */
+const RANK_PRICE=15;
+let rank=meta.rankPending||null; // {A,B} : les deux tirages en attente de choix (gardés même si on recharge la page)
+async function buyRanking(){
+  if(buying||rank||meta.coins<RANK_PRICE||(pending&&!pending.done))return;
+  buying=true;lastRes=null;meta.coins-=RANK_PRICE;regen();updPackBtn();
+  document.getElementById("stage").innerHTML='<div class="mut idle">Deux CD sortent de l’usine…<br>la première fois peut prendre quelques secondes.</div>';document.getElementById("res2").innerHTML="";
+  let c1,c2=null;
+  try{
+    prefetch();c1=await ready.promise;ready=null;if(albumDone(c1.rg)){prefetch();c1=await ready.promise;ready=null}
+    for(let k=0;k<12&&!c2;k++){const c=await prepareCD("*");if(c.rg!==c1.rg&&!albumDone(c.rg))c2=c}
+    if(!c2)throw new Error("pas assez d’albums différents");
+  }catch(e){meta.coins+=RANK_PRICE;ready=null;buying=false;regen();updPackBtn();document.getElementById("stage").innerHTML=e.message=="COLLECTION_COMPLETE"?'<div class="mut idle"><b>Bravo !</b><br>Tu as complété tous les albums du jeu.<br>Pièces remboursées.</div>':'<div class="mut idle">Impossible de préparer les deux CD ('+esc(e.message)+').<br>Pièces remboursées, réessaie.</div>';return}
+  buying=false;
+  rank={A:rollCD(c1),B:rollCD(c2)};meta.rankPending=rank;save();beep(330,.08);prefetch();
+  renderPack();
+  [rank.A,rank.B].forEach(R=>ensurePhotos([R.d.artist]));
+}
+function rankCard(R,k){
+  const d=R.d,n=d.tracks.length;
+  return`<div class="rkcard"><div class="rkcov">${cov(R.id,d.title,"ring"+R.ar)}</div>
+  <div class="rkt">${esc(d.title)}</div><div class="rkart">${esc(d.artist)} · ${esc((d.year||"").slice(0,4))}</div>
+  <div class="rkbadges"><span class="pill r${R.ar}">Album ${RN[R.ar]}</span>${R.firstArtist?'<span class="new">Nouvelle popstar</span>':""}${R.isNew?'<span class="new">Nouvel album</span>':'<span class="old">Déjà dans ta collection</span>'}</div>
+  <div class="rkprog"><div class="row"><span class="mut">Complétion</span><b>${R.before} / ${n}</b></div><div class="bar"><i style="width:${R.before/n*100}%"></i></div></div>
+  <button class="btn big" data-rank="${k}">Garder ce CD</button></div>`;
+}
+function showRank(){
+  document.getElementById("stage").innerHTML="";
+  document.getElementById("res2").innerHTML='<div class="rkinfo">Choisis le CD que tu gardes<div class="mut" style="font-weight:500;margin-top:2px">Tu découvres ses chansons après. L’autre CD est perdu.</div></div><div class="rkgrid">'+rankCard(rank.A,"A")+rankCard(rank.B,"B")+'</div>';
+}
+function chooseRank(k){
+  if(!rank||!rank[k])return;
+  const R=rank[k];applyRoll(R);rank=null;delete meta.rankPending;
+  R.done=false;pending=R;lastRes=null;save();regen();
+  renderPack();                                   // le CD choisi apparaît scellé…
+  setTimeout(()=>{const cd=document.getElementById("cd");if(cd)cd.click()},350);   // …et s'ouvre tout seul : pochette, effets, puis les chansons
+  ensurePhotos([R.d.artist]);
+}
+document.addEventListener("click",e=>{const x=e.target.closest("[data-rank]");if(x&&tab==0)chooseRank(x.dataset.rank)});
 /* ---------- COLLECTION (façon Apple Music) ---------- */
 function renderColl(){
   const ids=Object.keys(db);
@@ -762,7 +857,7 @@ function renderProfile(){
   <details class="plpanel gradebox" style="margin-top:16px"><summary>Les grades et les paliers</summary>
     <div class="helpbox" style="margin-top:8px">Ton <b>grade</b> dépend du nombre de <b>chansons différentes</b> que tu as débloquées : les doublons ne comptent pas. ${totalSongs?`Le jeu contient environ <b>${totalSongs.toLocaleString("fr-FR")} chansons</b>.`:""}</div>
     ${RANKS.map((r,i)=>`<div class="grow ${songs>=r[0]?"done":""} ${i==ri?"now":""}"><span class="dot">${songs>=r[0]?"✓":""}</span><b>${r[1]}</b><span>${r[0]?r[0].toLocaleString("fr-FR")+" chansons":"au départ"}</span></div>`).join("")}
-    <div class="helpbox"><b>Les certifications</b> (disques Bronze à Platine) comptent combien de chansons de chaque rareté tu possèdes. La rareté d’une chanson vient de ses streams Spotify cumulés.<br><br><b>Le Hall of Fame</b> expose jusqu’à ${MAXFAV} albums que tu as <b>complétés</b> (toutes les chansons trouvées). Le premier est ton n°1, mis en avant.<br><br><b>Les pièces :</b> un CD coûte ${PRICE} pièces. Tu en gagnes avec le temps (+${REGEN_COINS} par minute, jusqu’à ${MAXFREE}), avec les doublons et en complétant un album.</div>
+    <div class="helpbox"><b>Les certifications</b> (disques Bronze à Platine) comptent combien de chansons de chaque rareté tu possèdes. La rareté d’une chanson vient de ses streams Spotify cumulés.<br><br><b>Le Hall of Fame</b> expose jusqu’à ${MAXFAV} albums que tu as <b>complétés</b> (toutes les chansons trouvées). Le premier est ton n°1, mis en avant.<br><br><b>Les pièces :</b> un CD coûte ${PRICE} pièces. Tu en gagnes avec le temps (+${REGEN_COINS} par heure, jusqu’à ${MAXFREE}), avec les doublons et en complétant un album.</div>
   </details>
   <h2>Mes certifications</h2>
   <div class="certs">${RN.map((n,i)=>`<div class="cert r${i}"><i></i><b>${rc[i]}</b>${n}</div>`).join("")}</div>
@@ -819,10 +914,11 @@ function renderPlaylists(){
     return;
   }
   cur.songs=cur.songs.filter(([rg,i])=>songInfo(rg,i)); // retire les chansons qui ne sont plus dans la collection
+  if(pl.tview)return renderTournament(cur);
   const songs=plSongs(cur);
   let h=`<button class="back" data-pl="back">‹ Playlists</button>
   <div class="plhead">${mosaicHTML(cur)}<div style="min-width:0">${pl.ren?`<div class="renrow"><input id="plname" value="${esc(cur.name)}" maxlength="40" autocomplete="off"><button class="btn sm" data-pl="rensave">OK</button></div>`:`<h3>${esc(cur.name)}</h3>`}<div class="mut">${songs.length} chanson${songs.length>1?"s":""} · ${new Set(songs.map(s=>s.artist)).size} artiste${new Set(songs.map(s=>s.artist)).size>1?"s":""}</div>${pl.ren?"":`<button class="linkbtn" data-pl="rename">Renommer</button>`}</div></div>
-  <div class="plbtns"><button class="btn sm" data-pl="add">${pl.add?"Fermer":"Ajouter des chansons"}</button><button class="btn sm alt" data-pl="export">${pl.exp?"Fermer l’export":"Exporter"}</button>${pl.cdel?`<button class="btn sm" data-pl="delok">Confirmer la suppression</button><button class="btn sm alt" data-pl="delno">Annuler</button>`:`<button class="btn sm danger" data-pl="del">Supprimer</button>`}</div>${pl.cdel?`<div class="mut" style="margin:2px 0 6px">Tes chansons restent dans ta collection.</div>`:""}`;
+  <div class="plbtns"><button class="btn sm" data-pl="add">${pl.add?"Fermer":"Ajouter des chansons"}</button><button class="btn sm alt" data-pl="export">${pl.exp?"Fermer l’export":"Exporter"}</button><button class="btn sm alt" data-pl="tour">Ranking</button>${pl.cdel?`<button class="btn sm" data-pl="delok">Confirmer la suppression</button><button class="btn sm alt" data-pl="delno">Annuler</button>`:`<button class="btn sm danger" data-pl="del">Supprimer</button>`}</div>${pl.cdel?`<div class="mut" style="margin:2px 0 6px">Tes chansons restent dans ta collection.</div>`:""}`;
   if(pl.exp){
     h+=`<div class="plpanel"><h4>Exporter vers une plateforme</h4>
       ${songs.length?`<div class="plbtns" style="margin-top:0"><button class="btn sm" data-pl="copy">Copier la liste</button><button class="btn sm alt" data-pl="csv">Télécharger en CSV</button><button class="btn sm alt" data-pl="txt">Télécharger en .txt</button></div><div id="plmsg" class="mut" style="min-height:18px;margin-top:6px"></div>
@@ -860,6 +956,24 @@ document.addEventListener("click",async e=>{
   if(a=="open"){pl={id:D.id,add:false,q:"",r:-1,exp:false};renderPlaylists();window.scrollTo(0,0);return}
   if(a=="back"){pl.id=null;renderPlaylists();return}
   if(!cur)return;
+  if(a=="tour"){pl.tview=true;pl.tsetup=false;pl.add=false;pl.exp=false;renderPlaylists();window.scrollTo(0,0);return}
+  if(a=="tourquit"){pl.tview=false;pl.tsetup=false;renderPlaylists();return}
+  if(a=="tourstart"){
+    const all=plSongs(cur).map(s=>s.rg+":"+s.i);if(all.length<2)return;
+    const keys=all.length>MAXTOUR?shuf(all).slice(0,MAXTOUR):all;
+    const mode=(document.querySelector('input[name="tmode"]:checked')||{}).value||"rand";
+    cur.tour=newTourney(keys,mode=="rand");pl.tsetup=false;save();renderPlaylists();return}
+  if(a=="tourpick"){const T=cur.tour;if(!T||T.done)return;tourPick(T,+D.side);save();beep(520,.08,"triangle",.1);buzz(12);
+    if(T.done){chime(4);confetti(70);buzz([30,40,30,40,90])}
+    renderPlaylists();window.scrollTo(0,0);return}
+  if(a=="tourundo"){if(cur.tour&&tourUndo(cur.tour)){save();renderPlaylists()}return}
+  if(a=="tourredo"){cur.tour=null;pl.tsetup=true;save();renderPlaylists();return}
+  if(a=="tourimg"){
+    const box=document.getElementById("tourimgbox");if(!box||!cur.tour)return;box.innerHTML='<div class="mut">Création de l’image…</div>';
+    const r=await makeTourImage(cur,cur.tour);tourBlob=r.blob;
+    box.innerHTML=`<img src="${r.url}" alt="Classement de ${esc(cur.name)}"><div class="plbtns" style="justify-content:center"><button class="btn sm" data-pl="tourdl">Télécharger l’image</button>${navigator.canShare&&navigator.canShare({files:[new File([r.blob],"x.png",{type:"image/png"})]})?'<button class="btn sm alt" data-pl="toursh">Partager</button>':""}</div>`;return}
+  if(a=="tourdl"&&tourBlob){const u=URL.createObjectURL(tourBlob),l=document.createElement("a");l.href=u;l.download="classement-"+fileName(cur)+".png";document.body.appendChild(l);l.click();setTimeout(()=>{URL.revokeObjectURL(u);l.remove()},600);return}
+  if(a=="toursh"&&tourBlob){try{await navigator.share({files:[new File([tourBlob],"classement.png",{type:"image/png"})],title:"Mon classement PopDex"})}catch(e){}return}
   if(a=="add"){pl.add=!pl.add;pl.exp=false;renderPlaylists();return}
   if(a=="export"){pl.exp=!pl.exp;pl.add=false;renderPlaylists();return}
   if(a=="rename"){pl.ren=true;renderPlaylists();return}
@@ -905,6 +1019,114 @@ document.addEventListener("click",e=>{
     sheetMsg=add?`Ajouté à « ${p.name} »`:`Déjà dans « ${p.name} »`;save();drawSheet();return}
   if(D.sheetnew){const p={id:"p"+Date.now(),name:"Ma playlist "+(list.length+1),songs:[]};list.push(p);sheetSongs().forEach(([r,i])=>p.songs.push([r,i]));sheetMsg=`Playlist « ${p.name} » créée (tu peux la renommer dans l’onglet Playlists)`;save();drawSheet();return}
 });
+/* ---------- TOURNOI : classe les chansons d'une playlist par duels, comme un tournoi de tennis ---------- */
+const MAXTOUR=96;
+const roundName=size=>size==2?"Finale":size==4?"Demi-finales":size==8?"Quarts de finale":size==16?"Huitièmes de finale":size==32?"Seizièmes de finale":"Tour de "+size;
+const shuf=a=>{const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b};
+const songByKey=k=>{const [rg,i]=k.split(":");return songInfo(rg,+i)};
+function newTourney(keys,random){
+  const items=random?shuf(keys):keys.slice(),n=items.length;let P=1;while(P<n)P*=2;const byes=P-n;
+  let pairs=[],k=0;
+  for(let b=0;b<byes;b++)pairs.push([items[k++],null]);          // « passe-droits » : ces chansons avancent sans adversaire
+  while(k<n){pairs.push([items[k],items[k+1]]);k+=2}
+  if(random)pairs=shuf(pairs);                                     // passe-droits répartis au hasard dans le tableau
+  const T={n,P,size:P,pairs,idx:0,winners:[],elim:[],played:0,total:n-1,done:false,hist:[]};
+  tourSkipByes(T);return T;
+}
+function tourSkipByes(T){
+  while(!T.done){
+    while(T.idx<T.pairs.length&&(T.pairs[T.idx][0]===null||T.pairs[T.idx][1]===null)){const p=T.pairs[T.idx];T.winners.push(p[0]===null?p[1]:p[0]);T.idx++}
+    if(T.idx<T.pairs.length)return;                                // un vrai duel t'attend
+    if(T.winners.length==1){T.done=true;T.champion=T.winners[0];return}
+    const w=T.winners;T.pairs=[];for(let i=0;i<w.length;i+=2)T.pairs.push([w[i],w[i+1]]);
+    T.winners=[];T.idx=0;T.size=T.size/2;                          // tour suivant
+  }
+}
+function tourPick(T,side){
+  const {hist,...snap}=T;hist.push(JSON.stringify(snap));
+  const [a,b]=T.pairs[T.idx],win=side==0?a:b,lose=side==0?b:a;
+  T.winners.push(win);T.elim.push({k:lose,size:T.size});T.idx++;T.played++;
+  tourSkipByes(T);
+}
+function tourUndo(T){
+  if(!T.hist.length)return false;
+  const h=T.hist,snap=JSON.parse(h.pop());delete T.champion;Object.assign(T,snap);T.hist=h;return true;
+}
+function tourRanking(T){ // classement final : vainqueur, finaliste, demi-finalistes (ex æquo)…
+  const out=[{k:T.champion,rank:1,tie:false}],by={};
+  T.elim.forEach(e=>(by[e.size]=by[e.size]||[]).push(e.k));
+  let rank=2;Object.keys(by).map(Number).sort((a,b)=>a-b).forEach(sz=>{by[sz].forEach(k=>out.push({k,rank,tie:by[sz].length>1}));rank+=by[sz].length});
+  return out;
+}
+const rankLabel=r=>r.rank==1?"1er":r.rank+"e";
+function tourCard(k,side){
+  const s=songByKey(k);if(!s)return"";
+  return`<button class="dcard" data-pl="tourpick" data-side="${side}">${cov(s.rg,s.album)}<b>${esc(s.t)}</b><span class="sub">${esc(s.artist)}</span><span class="pill r${s.sr}">${RN[s.sr]}</span></button>`;
+}
+function renderTournament(cur){
+  const songs=plSongs(cur),keys=songs.map(s=>s.rg+":"+s.i);
+  let T=cur.tour;
+  if(T&&!pl.tsetup){ // si des chansons ont disparu de la collection, on repart de zéro
+    const all=[...T.pairs.flat(),...T.winners,...T.elim.map(e=>e.k),T.champion].filter(Boolean);
+    if(all.some(k=>!songByKey(k))){cur.tour=null;T=null}
+  }
+  const back=`<button class="back" data-pl="tourquit">‹ ${esc(cur.name)}</button>`;
+  if(!T||pl.tsetup){
+    const n=keys.length,big=n>MAXTOUR;
+    app.innerHTML=`${back}<h1 class="pt" style="margin-top:6px">Ranking</h1><div class="sub0">Classe les chansons de « ${esc(cur.name)} » par duels, comme un tournoi de tennis : à chaque duel, tu choisis ta préférée, et la gagnante passe au tour suivant.</div>
+    ${n<2?`<div class="plpanel">Ajoute au moins <b>2 chansons</b> à la playlist pour lancer un tournoi.</div>`:`
+    <div class="plpanel"><b>${big?MAXTOUR:n} chansons</b> · <b>${(big?MAXTOUR:n)-1} duels</b>${big?`<div class="mut" style="margin-top:6px">Ta playlist en a ${n}. Un tournoi en prend ${MAXTOUR} au maximum : ${MAXTOUR} chansons seront tirées au hasard.</div>`:""}
+    <label class="opt"><input type="radio" name="tmode" value="rand" checked><div><b>Ordre au hasard</b><span>Les duels sont tirés au sort.</span></div></label>
+    <label class="opt"><input type="radio" name="tmode" value="order"><div><b>Ordre de la playlist</b><span>Les premières chansons de la liste ont un parcours plus facile.</span></div></label></div>
+    <button class="btn big" data-pl="tourstart" style="margin-top:6px">Lancer le tournoi</button>`}`;
+    return;
+  }
+  if(T.done){
+    const rk=tourRanking(T),w=songByKey(T.champion),show=rk.slice(0,Math.min(rk.length,10));
+    app.innerHTML=`${back}<div class="tourwin"><div class="crown">✦ Ta chanson préférée ✦</div><div class="frame big"><div class="mat">${cov(w.rg,w.album)}</div></div><h3>${esc(w.t)}</h3><div class="mut">${esc(w.artist)} · ${esc(w.album)}</div><div style="margin-top:8px"><span class="pill r${w.sr}">${RN[w.sr]}</span></div></div>
+    <h2>Classement</h2>${show.map(r=>{const s=songByKey(r.k);return s?`<div class="rkrow"><span class="rk">${rankLabel(r)}${r.tie?"<small>=</small>":""}</span>${cov(s.rg,s.album)}<div class="x"><b>${esc(s.t)}</b><span>${esc(s.artist)}</span></div></div>`:""}).join("")}
+    ${rk.length>10?`<div class="mut" style="padding:8px 0">… et ${rk.length-10} autres chansons.</div>`:""}
+    <div class="plbtns"><button class="btn" data-pl="tourimg">Créer l’image</button><button class="btn alt" data-pl="tourredo">Refaire un tournoi</button></div><div class="tourimg" id="tourimgbox"></div>`;
+    return;
+  }
+  const [a,b]=T.pairs[T.idx];
+  app.innerHTML=`${back}<div class="tourhead"><b>${T.size==T.P&&T.P>T.n?"Premier tour":roundName(T.size)}</b><span>Duel ${T.played+1} sur ${T.total}</span></div><div class="bar"><i style="width:${T.played/T.total*100}%"></i></div>
+  <div class="duel">${tourCard(a,0)}<div class="vs">VS</div>${tourCard(b,1)}</div>
+  <div class="mut" style="text-align:center;margin:6px 0 10px">Touche la chanson que tu préfères.</div>
+  <div class="plbtns" style="justify-content:center">${T.hist.length?`<button class="btn sm alt" data-pl="tourundo">Annuler le dernier choix</button>`:""}<button class="btn sm danger" data-pl="tourquit">Quitter (on garde ta progression)</button></div>`;
+}
+// ----- image du classement (PNG 1080 × 1350) -----
+let tourBlob=null;
+const loadImg=url=>new Promise(res=>{const im=new Image();im.crossOrigin="anonymous";im.onload=()=>res(im);im.onerror=()=>res(null);im.src=url;setTimeout(()=>res(null),12000)});
+function wrapText(ctx,text,x,y,maxW,lh,maxLines){
+  const words=String(text).split(/\s+/);let line="",lines=[];
+  for(const w of words){const t=line?line+" "+w:w;if(ctx.measureText(t).width>maxW&&line){lines.push(line);line=w}else line=t}
+  lines.push(line);if(lines.length>maxLines){lines=lines.slice(0,maxLines);lines[maxLines-1]=lines[maxLines-1].replace(/\s*\S*$/,"")+"…"}
+  lines.forEach((l,i)=>ctx.fillText(l,x,y+i*lh));return lines.length*lh;
+}
+async function makeTourImage(cur,T){
+  const W=1080,H=1350,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
+  const rk=tourRanking(T),infos=rk.map(r=>({r,s:songByKey(r.k)})).filter(o=>o.s);
+  const imgs=await Promise.all(infos.slice(0,4).map(o=>loadImg(COVER(o.s.rg))));
+  const g=x.createRadialGradient(W/2,0,100,W/2,300,1200);g.addColorStop(0,"#3a2c0a");g.addColorStop(.45,"#14100a");g.addColorStop(1,"#06050a");x.fillStyle=g;x.fillRect(0,0,W,H);
+  x.textAlign="center";x.fillStyle="#d4a017";x.font="800 26px system-ui,sans-serif";x.fillText("✦  M O N   C L A S S E M E N T  ✦",W/2,84);
+  x.fillStyle="#fff7cf";x.font="800 54px system-ui,sans-serif";wrapText(x,cur.name,W/2,150,W-160,60,1);
+  const cover=(img,s,px,py,sz,frame)=>{ // pochette avec cadre doré
+    const f=frame;const gg=x.createLinearGradient(px,py,px+sz,py+sz);gg.addColorStop(0,"#fff1b0");gg.addColorStop(.3,"#b8860b");gg.addColorStop(.6,"#f6dc7a");gg.addColorStop(1,"#8a5d0a");
+    x.fillStyle=gg;x.fillRect(px-f,py-f,sz+2*f,sz+2*f);x.fillStyle="#0d0b08";x.fillRect(px-f+6,py-f+6,sz+2*f-12,sz+2*f-12);
+    if(img)x.drawImage(img,px,py,sz,sz);else{const h=hue(s.album);const pg=x.createLinearGradient(px,py,px+sz,py+sz);pg.addColorStop(0,`hsl(${h} 70% 55%)`);pg.addColorStop(1,`hsl(${h+50} 70% 35%)`);x.fillStyle=pg;x.fillRect(px,py,sz,sz)}
+  };
+  const win=infos[0];cover(imgs[0],win.s,(W-480)/2,200,480,14);
+  x.fillStyle="#d4a017";x.font="800 24px system-ui,sans-serif";x.fillText("N°1",W/2,740);
+  x.fillStyle="#fff";x.font="800 52px system-ui,sans-serif";const h1=wrapText(x,win.s.t,W/2,800,W-140,58,2);
+  x.fillStyle="#cdb98a";x.font="500 30px system-ui,sans-serif";x.fillText(win.s.artist,W/2,800+h1+6,W-140);
+  // podium : 2e, 3e, 3e
+  const pod=infos.slice(1,4);const sz=200,gap=60,total=pod.length*sz+(pod.length-1)*gap;let px=(W-total)/2;
+  pod.forEach((o,i)=>{cover(imgs[i+1],o.s,px,960,sz,8);x.fillStyle="#d4a017";x.font="800 24px system-ui,sans-serif";x.fillText(rankLabel(o.r),px+sz/2,1200);
+    x.fillStyle="#fff";x.font="700 22px system-ui,sans-serif";wrapText(x,o.s.t,px+sz/2,1232,sz+gap-10,26,2);px+=sz+gap});
+  x.fillStyle="#8d7a4a";x.font="500 22px system-ui,sans-serif";x.fillText("PopDex · "+T.n+" chansons · "+T.total+" duels · "+new Date().toLocaleDateString("fr-FR"),W/2,H-34);
+  return new Promise(res=>c.toBlob(b=>res({blob:b,url:c.toDataURL("image/png")}),"image/png"));
+}
 /* ---------- POPSTARS ---------- */
 let starQ="",albQ="";
 function renderStars(){
