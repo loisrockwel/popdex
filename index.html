@@ -363,6 +363,11 @@ body.shake2{animation:bodyshake .55s 3}
 #coins .cmax{font-size:11px;font-weight:600;color:var(--mut);margin-left:2px;align-self:flex-end;padding-bottom:1px}
 #coins .rg{font-size:10.5px;font-weight:600;color:var(--mut);font-variant-numeric:tabular-nums;margin-left:1px}
 .btn small.rgbtn{display:block;font-size:11px;font-weight:600;opacity:.9;margin-top:1px;font-variant-numeric:tabular-nums}
+
+/* code secret */
+.codebox{margin:18px 0 0;font-size:12px;color:var(--mut)}
+.codebox summary{cursor:pointer;list-style:none;opacity:.7;padding:6px 0}.codebox summary::-webkit-details-marker{display:none}
+.codebox input{max-width:220px}
 </style>
 </head>
 <body>
@@ -952,6 +957,37 @@ function sortedAlbums(list){
   return ((k=="streams"||k=="done")?dir==1:dir==-1)?out.reverse():out;
 }
 const sortLabel=()=>{const k=albSort.k,up=albSort.dir==1;return k=="streams"?(up?"du plus écouté au moins écouté":"du moins écouté au plus écouté"):k=="done"?(up?"du plus au moins complété":"du moins au plus complété"):k=="year"?(up?"du plus ancien au plus récent":"du plus récent au plus ancien"):k=="color"?(up?"du rouge au violet, puis les gris":"du violet au rouge"):(up?"de A à Z":"de Z à A")};
+/* ---------- CODE SECRET (pour tester) : +1000 pièces à chaque saisie ---------- */
+// Le code n'est PAS écrit dans le fichier : on ne garde que son empreinte SHA-256 (le fichier est public).
+const CODE_HASH="05db8379662d8d622f31ba6ca3d6819abbe48eab94745fbb938800cf9d0e65e6",CODE_GAIN=1000;
+function sha256(str){
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const b=new TextEncoder().encode(str),l=b.length,n=((l+9+63)>>6)<<6,m=new Uint8Array(n);m.set(b);m[l]=0x80;
+  const dv=new DataView(m.buffer);dv.setUint32(n-8,Math.floor(l*8/4294967296));dv.setUint32(n-4,(l*8)>>>0);
+  let h=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];const w=new Uint32Array(64),rr=(x,k)=>(x>>>k)|(x<<(32-k));
+  for(let o=0;o<n;o+=64){
+    for(let i=0;i<16;i++)w[i]=dv.getUint32(o+i*4);
+    for(let i=16;i<64;i++){const s0=rr(w[i-15],7)^rr(w[i-15],18)^(w[i-15]>>>3),s1=rr(w[i-2],17)^rr(w[i-2],19)^(w[i-2]>>>10);w[i]=(w[i-16]+s0+w[i-7]+s1)>>>0}
+    let [a,b2,c,d,e,f,g,hh]=h;
+    for(let i=0;i<64;i++){const S1=rr(e,6)^rr(e,11)^rr(e,25),ch=(e&f)^(~e&g),t1=(hh+S1+ch+K[i]+w[i])>>>0,S0=rr(a,2)^rr(a,13)^rr(a,22),mj=(a&b2)^(a&c)^(b2&c),t2=(S0+mj)>>>0;hh=g;g=f;f=e;e=(d+t1)>>>0;d=c;c=b2;b2=a;a=(t1+t2)>>>0}
+    h=[(h[0]+a)>>>0,(h[1]+b2)>>>0,(h[2]+c)>>>0,(h[3]+d)>>>0,(h[4]+e)>>>0,(h[5]+f)>>>0,(h[6]+g)>>>0,(h[7]+hh)>>>0];
+  }
+  return h.map(x=>x.toString(16).padStart(8,"0")).join("");
+}
+const codeOK=c=>sha256("popdex-test-v1:"+String(c).replace(/[\s-]/g,"").toUpperCase())===CODE_HASH;
+// le code ne marche que 10 fois ; le compteur est gardé à part de la partie (« Nouvelle partie » ne le remet pas à zéro)
+const CODE_MAX=10,CODE_KEY="popdex_cu";
+const codeUses=()=>{try{return Math.max(0,parseInt(localStorage.getItem(CODE_KEY)||"0",10)||0)}catch(e){return 0}};
+function submitCode(){
+  const i=document.getElementById("codein"),m=document.getElementById("codemsg");if(!i||!m)return;
+  if(codeOK(i.value)){
+    const u=codeUses();
+    if(u>=CODE_MAX){m.textContent="Ce code a déjà servi "+CODE_MAX+" fois : il n’ajoute plus de pièces.";m.style.color="var(--mut)"}
+    else{try{localStorage.setItem(CODE_KEY,String(u+1))}catch(e){}
+      meta.coins+=CODE_GAIN;save();regen();m.textContent="+"+CODE_GAIN+" pièces ajoutées ✓ (utilisation "+(u+1)+"/"+CODE_MAX+" · solde : "+meta.coins+")";m.style.color="var(--acc)";beep(660,.12,"triangle",.1);confetti(20)}
+  }else{m.textContent="Code incorrect.";m.style.color="var(--mut)"}
+  i.value="";
+}
 /* ---------- PROFIL / HALL OF FAME ---------- */
 const MAXFAV=9;
 const isComplete=d=>d&&d.tracks.length>0&&d.got.length>=d.tracks.length;
@@ -1002,6 +1038,7 @@ function renderProfile(){
     </div>
     ${hofPick?`<div class="picker"><h4>Albums complétés</h4>${picks.length?`<div class="pickgrid">${picks.map(id=>{const d=db[id];return`<div class="tile" data-favadd="${id}">${cov(id,d.title)}<div class="nm">${esc(d.title)}</div><div class="mut">${esc(d.artist)}</div></div>`}).join("")}</div>`:`<div class="mut" style="color:#bfa66a">Aucun album complété pour l’instant.<br>Trouve toutes les chansons d’un album pour pouvoir l’exposer.</div>`}</div>`:""}
   </div>
+  <details class="codebox"><summary>Code secret</summary><div class="renrow" style="margin-top:8px"><input id="codein" type="password" placeholder="Code" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn sm" data-code="1">OK</button></div><div id="codemsg" class="mut" style="min-height:18px;margin-top:6px"></div></details>
   <div class="savebox"><h2>Ma sauvegarde</h2>
     <div class="helpbox" style="margin-top:0">Ta progression est enregistrée <b>sur cet appareil, dans ce navigateur</b>. Pour jouer ailleurs ou la garder à l’abri, exporte-la dans un fichier, puis importe-la sur l’autre appareil.</div>
     <div class="plbtns"><button class="btn sm" data-save="export">Exporter ma sauvegarde</button><label class="btn sm alt filebtn">Importer<input type="file" id="impfile" accept=".json,application/json"></label>
@@ -1009,6 +1046,7 @@ function renderProfile(){
     <div id="savemsg" class="mut" style="min-height:18px">${profReset?"Cela efface tes albums, tes pièces et tes playlists sur cet appareil.":""}</div></div>`;
   if(profRen){const i=document.getElementById("pname");if(i){i.focus();i.select();i.addEventListener("keydown",ev=>{if(ev.key=="Enter")document.querySelector("[data-nameok]").click()})}}
 }
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="codein")submitCode()});
 document.addEventListener("change",e=>{ // import d'une sauvegarde
   if(e.target.id!=="impfile"||!e.target.files[0])return;
   const fr=new FileReader(),msg=t=>{const m=document.getElementById("savemsg");if(m)m.textContent=t};
@@ -1365,6 +1403,7 @@ function renderStars(){
   ensurePhotos(rs.map(r=>r.name)).then(c=>{if(c&&tab==2)draw()});
 }
 app.addEventListener("click",e=>{
+  if(e.target.closest("[data-code]")){submitCode();return}
   const sv=e.target.closest("[data-save]");
   if(sv){const a=sv.dataset.save;
     if(a=="export"){const data={app:"popdex",v:1,saved:new Date().toISOString(),db,meta};download("popdex-sauvegarde-"+new Date().toISOString().slice(0,10)+".json",JSON.stringify(data),"application/json");const m=document.getElementById("savemsg");if(m)m.textContent="Sauvegarde téléchargée.";return}
