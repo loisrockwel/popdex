@@ -310,6 +310,44 @@ body.shake2{animation:bodyshake .55s 3}
 .opt{display:flex;gap:10px;align-items:flex-start;background:var(--card);border-radius:14px;padding:12px;margin:8px 0;cursor:pointer}
 .opt input{width:auto;margin-top:3px}
 .opt b{display:block;font-size:15px}.opt span{font-size:12.5px;color:var(--mut)}
+
+/* ergonomie : cibles tactiles plus grandes, carte de choix cliquable, bouton Passer */
+.trk .addpl{width:36px;height:36px;font-size:20px}
+.addbtn{width:38px;height:38px}
+.ibtn{padding:9px 11px}
+.rkcard{cursor:pointer;transition:transform .15s,box-shadow .15s}.rkcard:active{transform:scale(.98)}
+.rkcard:hover{box-shadow:0 0 0 2px var(--acc)}
+.skipbtn{position:absolute;right:6px;bottom:8px;z-index:30;background:#0008;color:#fff;border:0;border-radius:99px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.stage{position:relative}
+.chosenhead{text-align:center;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;font-size:13px;margin:8px 0 12px}
+
+/* fil d'Ariane */
+.crumbs{display:flex;align-items:center;flex-wrap:nowrap;gap:2px;margin:6px 0 4px;min-width:0;font-size:14px}
+.crumbs button{background:none;border:0;color:var(--acc);font-weight:600;font-size:14px;padding:11px 4px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34%;flex:0 1 auto;font-family:inherit}
+.crumbs button:hover{text-decoration:underline}
+.crumbs .sep{color:var(--mut);opacity:.7;flex:none;padding:0 1px}
+.crumbs b{color:var(--ink);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1 1 auto;padding:11px 2px}
+
+/* liens vers la page de l'artiste / de l'album */
+.lnk{background:none;border:0;padding:3px 0;color:var(--ink);font:inherit;font-weight:700;cursor:pointer;text-decoration:underline;text-decoration-color:var(--acc);text-underline-offset:3px;text-align:left}
+.lnk:hover{color:var(--acc)}
+.lnk2{cursor:pointer;text-decoration:underline;text-decoration-color:#8883;text-underline-offset:2px}
+.lnk2:hover{color:var(--acc);text-decoration-color:var(--acc)}
+
+/* mode Chaos */
+.cta{flex-wrap:wrap}
+.cta .btn.chaos{flex:1 1 100%;background:linear-gradient(110deg,#ff3d3d,#ff8a00,#ffd000,#ff3d9a,#ff3d3d);background-size:300% 100%;animation:chaosflow 5s linear infinite;color:#1a0a00;flex-direction:row;gap:10px;flex-wrap:wrap}
+.cta .btn.chaos .chaoslbl{font-weight:900;letter-spacing:.5px;text-transform:uppercase}
+.cta .btn.chaos .pr{background:#0003}
+.cta .btn.chaos small{flex-basis:100%;font-size:11px;font-weight:700;opacity:.85}
+.cta .btn.chaos:disabled{animation:none;opacity:.45}
+@keyframes chaosflow{to{background-position:300% 0}}
+.rkgrid.four{grid-template-columns:1fr 1fr}
+@media(min-width:760px){.rkgrid.four{grid-template-columns:repeat(4,1fr)}}
+.chaosinfo{background:linear-gradient(110deg,#ff3d3d,#ff8a00,#ffd000);-webkit-background-clip:text;color:transparent;font-size:24px;letter-spacing:1px;text-transform:uppercase;animation:none}
+.chaosinfo .mut{-webkit-text-fill-color:var(--mut);text-transform:none;letter-spacing:0;font-size:14px}
+.chaosinfo b{-webkit-text-fill-color:#ffb300}
+.bonustag.chaos{background:linear-gradient(90deg,#ff3d3d,#ff8a00,#ffd000);color:#1a0a00}
 </style>
 </head>
 <body>
@@ -517,6 +555,7 @@ async function getStreams(al,std,aid){
   const lm={};rc.forEach(x=>lm[x.recording_mbid]=x.total_listen_count||0);
   std.sc=std.r.map(i=>lm[i]||0);std.n=rg[0]?.total_listen_count||0;std.src="l";saveC();return std;
 }
+const crumbs=items=>'<div class="crumbs">'+items.map((it,i)=>i<items.length-1?`<button ${it.a}>${esc(it.t)}</button><span class="sep">›</span>`:`<b>${esc(it.t)}</b>`).join("")+"</div>";
 const albumDone=id=>!!(db[id]&&isComplete(db[id])); // un album complété ne retombe plus
 async function prepareCD(filter){
   const open=r=>{const al=libAlbums(r);return !al||al.some(a=>!albumDone(a.id))}; // la star a encore au moins un album à compléter
@@ -551,8 +590,9 @@ function newTarget(){
 let ready=null;
 function prefetch(){if(!ready||ready.filter!==artist){const f=artist,p=prepareCD(f);p.catch(()=>{if(ready&&ready.promise===p)ready=null});ready={filter:f,promise:p}}}
 /* ---------- audio / effets ---------- */
-let sound=true,ac=null;
-document.getElementById("snd").onclick=e=>{sound=!sound;e.currentTarget.classList.toggle("off",!sound)};
+let sound=(()=>{try{return localStorage.getItem("popdex_sound")!=="0"}catch(e){return true}})(),ac=null; // le réglage du son est mémorisé
+document.getElementById("snd").classList.toggle("off",!sound);
+document.getElementById("snd").onclick=e=>{sound=!sound;try{localStorage.setItem("popdex_sound",sound?"1":"0")}catch(err){}e.currentTarget.classList.toggle("off",!sound)};
 function beep(f,d=.12,type="sine",v=.12){if(!sound)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
 const buzz=n=>{try{navigator.vibrate&&navigator.vibrate(n)}catch(e){}};
 function confetti(n){const cols=["#fa2d48","#ffb300","#3d8bff","#a24dff","#3dffb0"];for(let i=0;i<n;i++){const e=document.createElement("i");e.className="cf";e.style.left=Math.random()*100+"vw";e.style.background=cols[i%cols.length];e.style.animationDelay=Math.random()*.6+"s";e.style.animationDuration=1.8+Math.random()*1.4+"s";document.body.appendChild(e);setTimeout(()=>e.remove(),3500)}}
@@ -566,24 +606,27 @@ function renderPack(){
   artist="*";
   app.innerHTML=`<h1 class="pt">Ouvrir un CD</h1>
   <div class="stage" id="stage"></div><div id="res2"></div>
-  <div class="cta"><button class="btn big" id="open"></button><button class="btn big rank" id="rank"></button></div>
+  <div class="cta"><button class="btn big" id="open"></button><button class="btn big rank" id="rank"></button><button class="btn big chaos" id="chaos"></button></div>
   <details class="info"><summary>Comment ça marche</summary>
   <p>Un CD coûte ${PRICE} pièces et contient <b>2 chansons</b> du même album, d’une popstar tirée au hasard (toutes ont la même chance, tu ne choisis pas). Parfois, un CD bonus en contient plus : <b>3</b> (1 chance sur 10), <b>4</b> (1 sur 100), <b>5</b> (1 sur 1 000) ou <b>6</b> (1 sur 10 000).</p>
   <p>La rareté d’une chanson ou d’un album dépend de ses streams Spotify cumulés (données Kworb) : ${RN.map((n,i)=>`<span class="pill r${i}">${n}</span>`).join(" ")}</p>
   <p>Au début, tu retombes souvent sur les albums que tu as déjà. Plus ta collection avance, plus les <b>nouveaux albums</b> deviennent fréquents.</p>
+  <p><b>Mode Chaos</b> (${CHAOS_PRICE} pièces) : <b>4 CD différents</b> au choix, et tu débloques <b>2 chansons de plus</b> quel que soit celui que tu prends.</p>
   <p><b>Mode Choix</b> (${RANK_PRICE} pièces) : le jeu prépare <b>2 CD différents</b>. Tu vois l’album, la popstar, si c’est une nouveauté et où tu en es dans l’album, mais pas les chansons : tu en gardes un seul, puis il s’ouvre. Le résultat dans ta collection est le même qu’avec un CD classique.</p>
   <p>Doublon : +${DUPC.join(" / +")} pièces selon la rareté. Album complété : +50. Pièces offertes : tu démarres avec ${START_COINS}, puis +${REGEN_COINS} par heure (jusqu’à ${MAXFREE}).</p></details>`;
-  document.getElementById("open").onclick=buyCD;document.getElementById("rank").onclick=buyRanking;
+  document.getElementById("open").onclick=buyCD;document.getElementById("rank").onclick=buyRanking;document.getElementById("chaos").onclick=buyChaos;
   updPackBtn();prefetch();
   if(rank)showRank();else if(pending&&!pending.done)showSealed();else if(lastRes)showResult(lastRes);else document.getElementById("stage").innerHTML='<div class="mut idle">Ouvre un CD scellé pour découvrir<br>une popstar, un album et 2 chansons.</div>';
 }
 function updPackBtn(){const b=document.getElementById("open");if(!b)return;
+  const cb=document.getElementById("chaos");
+  if(cb){cb.disabled=buying||!!rank||(!!pending&&!pending.done)||meta.coins<CHAOS_PRICE;cb.innerHTML=rank?"Choisis un CD":buying?"Fabrication…":`<span class="chaoslbl">Mode Chaos</span><span class="pr"><i class="coin"></i>${CHAOS_PRICE}</span><small>4 CD au choix · +2 chansons offertes</small>`}
   const rb=document.getElementById("rank");
   if(rb){rb.disabled=buying||!!rank||(!!pending&&!pending.done)||meta.coins<RANK_PRICE;rb.innerHTML=rank?"Choisis un CD":buying?"Fabrication…":`Mode Choix<span class="pr"><i class="coin"></i>${RANK_PRICE}</span><small>2 CD, tu en gardes 1</small>`}
   b.disabled=buying||!!rank||(!!pending&&!pending.done)||meta.coins<PRICE;
   b.innerHTML=buying?"Fabrication du CD…":pending&&!pending.done?"Touche le CD pour l’ouvrir":meta.coins<PRICE?"Pas assez de pièces":`Acheter un CD<span class="pr"><i class="coin"></i>${PRICE}</span>`}
 // Tirage d'un CD, calculé sans rien modifier : l'album, les chansons obtenues, les doublons, la complétion…
-function rollCD(cd){
+function rollCD(cd,extra=0){
   const ar=rar(cd.n,ALB_T),ex=db[cd.rg],isNew=!ex;
   const d=ex?{...ex,got:ex.got.slice(),tracks:ex.tracks.slice(),sc:(ex.sc||[]).slice()}:{artist:cd.artist,aid:cd.aid,title:cd.title,year:cd.year,kind:cd.kind,n:cd.n,tracks:cd.tracks,sc:cd.sc,got:[]};
   if(d.tracks.length!=cd.tracks.length||d.tracks.some((t,i)=>norm(t)!=norm(cd.tracks[i]))){
@@ -591,7 +634,8 @@ function rollCD(cd){
     d.tracks=cd.tracks;d.got=cd.tracks.map((t,i)=>have.includes(norm(t))?i:-1).filter(i=>i>=0);d.sc=cd.sc;
   }
   if(!d.sc||d.sc.length!=d.tracks.length)d.sc=cd.sc;
-  const idx=d.tracks.map((_,i)=>i).sort(()=>Math.random()-.5).slice(0,Math.min(songsInCD(),d.tracks.length));
+  const base0=songsInCD(),idx=d.tracks.map((_,i)=>i).sort(()=>Math.random()-.5).slice(0,Math.min(base0+extra,d.tracks.length));
+  const base=Math.min(base0,idx.length);   // chansons « normales » ; le reste = chansons offertes par le mode Chaos
   // jamais deux doublons dans le même CD : au plus 1 chanson déjà possédée, sauf si l'album est complet
   const fresh=d.tracks.map((_,i)=>i).filter(i=>!d.got.includes(i)&&!idx.includes(i));
   const dupAt=()=>idx.map((x,p)=>d.got.includes(x)?p:-1).filter(p=>p>=0);
@@ -600,7 +644,7 @@ function rollCD(cd){
   const before=d.got.length,after=before+pulls.filter(p=>!p.dup).length;
   const complete=before<d.tracks.length&&after==d.tracks.length;
   const firstArtist=isNew&&!Object.entries(db).some(([k,x])=>k!=cd.rg&&x.artist==d.artist);
-  return{id:cd.rg,d,ar,pulls,complete,bonus:complete?50:0,isNew,firstArtist,before,after,done:false};
+  return{id:cd.rg,d,ar,pulls,base,extra:idx.length-base,complete,bonus:complete?50:0,isNew,firstArtist,before,after,done:false};
 }
 // Applique un tirage à la collection et aux pièces (le CD choisi, en mode Ranking)
 function applyRoll(R){
@@ -622,23 +666,29 @@ async function buyCD(){
 }
 function cdHTML(rg,title,sealed,isNew){return`<div class="cdwrap${isNew?" newalb":""}" id="cd" style="--h:${hue(title)}"><div class="tray" id="tray" data-t="${esc(title)}" style="background-image:url(${COVER(rg)})"></div><img src="${COVER(rg)}" alt="" style="display:none" onerror="this.parentNode.classList.add('nocov')"><div class="disc" id="disc"></div>${isNew?'<div class="ribbon">Nouvel album</div>':""}<div class="lid"><span>?</span></div>${sealed?'<div class="wrap">Touche pour ouvrir</div>':""}</div><div class="tier" id="tier"></div>`}
 function showSealed(){const d=db[pending.id];document.getElementById("stage").innerHTML=cdHTML(pending.id,d.title,true,pending.isNew);document.getElementById("res2").innerHTML="";const cd=document.getElementById("cd");cd.onclick=()=>tear(cd)}
-const rowHTML=(P,p,d)=>`<div class="gs r${p.sr}">${cov(P.id,d.title)}<div class="x"><b>${esc(p.t)}</b><span class="sub">${esc(d.artist)} · ${esc(d.title)}</span><span class="sub">${p.n?fmt(p.n)+" streams":"—"}</span></div><div class="tags"><span class="pill r${p.sr}">${RN[p.sr]}</span>${p.dup?`<span>Doublon +${DUPC[p.sr]}</span>`:'<span class="new">Nouveau</span>'}${P.pulls.indexOf(p)>=2?'<span class="bonustag">Bonus</span>':""}</div></div>`;
+const rowHTML=(P,p,d)=>`<div class="gs r${p.sr}">${cov(P.id,d.title)}<div class="x"><b>${esc(p.t)}</b><span class="sub"><span class="lnk2" data-ar="${esc(d.artist)}">${esc(d.artist)}</span> · <span class="lnk2" data-rg="${P.id}">${esc(d.title)}</span></span><span class="sub">${p.n?fmt(p.n)+" streams":"—"}</span></div><div class="tags"><span class="pill r${p.sr}">${RN[p.sr]}</span>${p.dup?`<span>Doublon +${DUPC[p.sr]}</span>`:'<span class="new">Nouveau</span>'}${(()=>{const i=P.pulls.indexOf(p),b=P.base??P.pulls.length;return i>=b?'<span class="bonustag chaos">Chaos</span>':i>=2?'<span class="bonustag">Bonus</span>':""})()}</div></div>`;
 const sumHTML=(P,d)=>{const left=d.tracks.length-d.got.length,pct=d.got.length/d.tracks.length*100;
   return`<div class="sum">${P.firstArtist?`<div class="l" style="margin-bottom:12px">${ph(d.artist)}<div class="sp"><span class="tag">Nouvelle popstar</span><br><b>${esc(d.artist)}</b></div></div>`:""}
   <div class="row"><div class="sp"><b>${esc(d.title)}</b><div class="mut">${P.isNew?"Nouvel album · ":""}${esc(d.artist)}</div></div><b>${d.got.length}/${d.tracks.length}</b></div>
   <div class="bar"><i style="width:${pct}%"></i></div>
-  <div class="mut" style="margin-top:8px">${P.complete?`<span class="tag">Album complété · +${P.bonus} pièces</span>`:left==1?"Il t’en manque une seule.":left<=3?`Plus que ${left} chansons.`:`Encore ${left} chansons à trouver.`}</div></div>`};
+  <div class="mut" style="margin-top:8px">${P.complete?`<span class="tag">Album complété · +${P.bonus} pièces</span>`:left==1?"Il t’en manque une seule.":left<=3?`Plus que ${left} chansons.`:`Encore ${left} chansons à trouver.`}</div>
+  <button class="btn sm alt" style="margin-top:10px" data-gotoalb="${P.id}">Voir l’album</button></div>`};
 async function tear(cd){
   if(pending.busy)return;pending.busy=true;const my=++token,P=pending,d=db[P.id],ok=()=>my==token;
-  cd.classList.add("shake");beep(180,.4,"sawtooth",.06);buzz(60);await sleep(520);if(!ok())return;
-  cd.classList.add("torn");beep(900,.15,"square",.05);buzz([30,30,30]);await sleep(450);if(!ok())return;
+  // vitesse : le mode Choix s'ouvre en accéléré ; « Passer » termine l'animation tout de suite
+  let skipRes;const skipP=new Promise(r=>skipRes=r);const F=P.fast?0.28:1;
+  P.skip=()=>{P.skipped=true;skipRes()};
+  const nap=ms=>P.skipped?Promise.resolve():Promise.race([sleep(ms*F),skipP]);
+  P.t0=performance.now();
+  if(!P.fast){cd.classList.add("shake");beep(180,.4,"sawtooth",.06);buzz(60);await nap(520);if(!ok())return}
+  cd.classList.add("torn");if(!P.fast){beep(900,.15,"square",.05);buzz([30,30,30]);await nap(450);if(!ok())return}
   cd.classList.add("open");document.getElementById("disc").classList.add("out");beep(260,.25);
   if(P.isNew){confetti(P.firstArtist?55:28);[0,4,7,12,16].forEach((n,i)=>setTimeout(()=>beep(523*Math.pow(2,n/12),.22,"triangle",.11),i*100));buzz([40,40,40,40,80])}
-  await sleep(P.isNew?1500:900);if(!ok())return;
-  if(P.pulls.length>2){await bonusFX(P.pulls.length);if(!ok())return}
+  await nap(P.isNew?1500:900);if(!ok())return;
+  if(P.pulls.length>2&&!P.skipped){await Promise.race([bonusFX(P.pulls.length,P.fast),skipP]);if(!ok())return}
   const t=document.getElementById("tier");t.className="tier on t"+P.ar+"c";t.textContent="Album "+RN[P.ar]+" · "+P.pulls.length+" titres"+(P.pulls.length>2?" · "+BONUS[Math.min(6,P.pulls.length)].n+" !":"");
   chime(P.ar);
-  await sleep(900);if(!ok())return;
+  await nap(900);if(!ok())return;
   P.done=true;lastRes=P;updPackBtn();
   const box=document.getElementById("res2");box.innerHTML='<div class="got" id="got"></div>';
   for(const p of P.pulls){
@@ -646,14 +696,16 @@ async function tear(cd){
     const cdel=document.getElementById("cd");if(cdel){cdel.style.setProperty("--glow","var(--c"+p.sr+")");cdel.classList.remove("pulse");void cdel.offsetWidth;cdel.classList.add("pulse")} // la pochette pulse à la couleur de la rareté
     if(p.dup)beep(300,.14,"sawtooth",.05);else chime(p.sr);
     if(p.sr==4)confetti(60);else if(p.sr==3)confetti(18);
-    buzz(p.sr>=3?[20,40,20]:15);await sleep(p.sr>=3?900:560);if(!ok())return;
+    buzz(p.sr>=3?[20,40,20]:15);await nap(p.sr>=3?900:560);if(!ok())return;
   }
   box.insertAdjacentHTML("beforeend",sumHTML(P,d));
   if(P.complete){confetti(90);[0,4,7,12].forEach((n,i)=>setTimeout(()=>beep(523*Math.pow(2,n/12),.25,"triangle",.12),i*140))}
   ensurePhotos([d.artist]).then(c=>{if(c&&tab==0&&lastRes===P){const m=box.querySelector(".sum .ph");if(m)m.outerHTML=ph(d.artist)}});
+  document.querySelectorAll(".skipbtn").forEach(e=>e.remove());
   regen();updPackBtn();
 }
 function showResult(P){
+  if(P.choix){const d=db[P.id];document.getElementById("stage").innerHTML="";document.getElementById("res2").innerHTML=chosenHead(P)+'<div class="got">'+P.pulls.map(p=>rowHTML(P,p,d)).join("")+"</div>"+sumHTML(P,d);return}
   const d=db[P.id];document.getElementById("stage").innerHTML=cdHTML(P.id,d.title,false,P.isNew);
   const cd=document.getElementById("cd");cd.classList.add("open","torn","still");document.getElementById("disc").classList.add("out");
   const t=document.getElementById("tier");t.className="tier on t"+P.ar+"c";t.textContent="Album "+RN[P.ar]+" · "+P.pulls.length+" titres"+(P.pulls.length>2?" · "+BONUS[Math.min(6,P.pulls.length)].n+" !":"");
@@ -677,8 +729,8 @@ function bonusSound(k){
   if(k>=5){beep(70,.55,"sine",.3);setTimeout(()=>beep(55,.7,"sine",.3),260)}
   if(k>=6)for(let i=0;i<6;i++)setTimeout(()=>beep(1200+i*150,.1,"square",.04),700+i*120);
 }
-async function bonusFX(k){
-  k=Math.min(6,Math.max(3,k));const cfg=BONUS[k];
+async function bonusFX(k,fast){
+  k=Math.min(6,Math.max(3,k));const cfg={...BONUS[k]};if(fast)cfg.d=cfg.d*.55;
   const fx=document.createElement("div");fx.className="bonusfx l"+k;fx.style.setProperty("--d",cfg.d+"s");fx.style.setProperty("--fs",cfg.fs+"px");
   fx.innerHTML=(k>=4?'<div class="dim"></div>':"")+(k>=4?`<div class="rays ${k>=5?"rainbow":""}"></div>`:"")+(k>=5?'<div class="flash"></div>':"")+`<div class="banner">${cfg.n}<b>×${k}</b><small>${k} chansons dans ce CD</small></div>`;
   document.body.appendChild(fx);
@@ -688,45 +740,81 @@ async function bonusFX(k){
   if(k>=5){document.body.classList.add(k>=6?"shake2":"shake");setTimeout(()=>document.body.classList.remove("shake","shake2"),k>=6?1800:600)}
   await sleep(cfg.d*1000);fx.remove();
 }
+function fxClear(){document.querySelectorAll(".bonusfx,.spark").forEach(e=>e.remove())}
 /* ---------- MODE CHOIX : 2 CD, on en garde un (15 pièces) ---------- */
-const RANK_PRICE=15;
+const RANK_PRICE=15,CHAOS_PRICE=30; // Choix : 2 CD pour 15 pièces · Chaos : 4 CD pour 30 pièces, +2 chansons offertes
 let rank=meta.rankPending||null; // {A,B} : les deux tirages en attente de choix (gardés même si on recharge la page)
-async function buyRanking(){
-  if(buying||rank||meta.coins<RANK_PRICE||(pending&&!pending.done))return;
-  buying=true;lastRes=null;meta.coins-=RANK_PRICE;regen();updPackBtn();
-  document.getElementById("stage").innerHTML='<div class="mut idle">Deux CD sortent de l’usine…<br>la première fois peut prendre quelques secondes.</div>';document.getElementById("res2").innerHTML="";
-  let c1,c2=null;
+async function buyMulti(count,price,extra,mode){
+  if(buying||rank||meta.coins<price||(pending&&!pending.done))return;
+  buying=true;lastRes=null;meta.coins-=price;regen();updPackBtn();
+  document.getElementById("stage").innerHTML='<div class="mut idle">'+(count==2?"Deux":"Quatre")+' CD sortent de l’usine…<br>la première fois peut prendre quelques secondes.</div>';document.getElementById("res2").innerHTML="";
+  const cds=[];
   try{
-    prefetch();c1=await ready.promise;ready=null;if(albumDone(c1.rg)){prefetch();c1=await ready.promise;ready=null}
-    for(let k=0;k<12&&!c2;k++){const c=await prepareCD("*");if(c.rg!==c1.rg&&!albumDone(c.rg))c2=c}
-    if(!c2)throw new Error("pas assez d’albums différents");
-  }catch(e){meta.coins+=RANK_PRICE;ready=null;buying=false;regen();updPackBtn();document.getElementById("stage").innerHTML=e.message=="COLLECTION_COMPLETE"?'<div class="mut idle"><b>Bravo !</b><br>Tu as complété tous les albums du jeu.<br>Pièces remboursées.</div>':'<div class="mut idle">Impossible de préparer les deux CD ('+esc(e.message)+').<br>Pièces remboursées, réessaie.</div>';return}
+    prefetch();let c1=await ready.promise;ready=null;if(albumDone(c1.rg)){prefetch();c1=await ready.promise;ready=null}
+    cds.push(c1);
+    for(let k=0;k<30&&cds.length<count;k++){const c=await prepareCD("*");if(!cds.some(x=>x.rg===c.rg)&&!albumDone(c.rg))cds.push(c)}
+    if(cds.length<count)throw new Error("pas assez d’albums différents");
+  }catch(e){meta.coins+=price;ready=null;buying=false;regen();updPackBtn();document.getElementById("stage").innerHTML=e.message=="COLLECTION_COMPLETE"?'<div class="mut idle"><b>Bravo !</b><br>Tu as complété tous les albums du jeu.<br>Pièces remboursées.</div>':'<div class="mut idle">Impossible de préparer les CD ('+esc(e.message)+').<br>Pièces remboursées, réessaie.</div>';return}
   buying=false;
-  rank={A:rollCD(c1),B:rollCD(c2)};meta.rankPending=rank;save();beep(330,.08);prefetch();
+  rank={_mode:mode};cds.forEach((c,i)=>rank["ABCD"[i]]=rollCD(c,extra));
+  meta.rankPending=rank;save();beep(330,.08);prefetch();
   renderPack();
-  [rank.A,rank.B].forEach(R=>ensurePhotos([R.d.artist]));
+  rankKeys().forEach(k=>ensurePhotos([rank[k].d.artist]));
 }
+const rankKeys=()=>rank?["A","B","C","D"].filter(k=>rank[k]):[];
+const buyRanking=()=>buyMulti(2,RANK_PRICE,0,"choix");
+const buyChaos=()=>buyMulti(4,CHAOS_PRICE,2,"chaos");
 function rankCard(R,k){
   const d=R.d,n=d.tracks.length;
-  return`<div class="rkcard"><div class="rkcov">${cov(R.id,d.title,"ring"+R.ar)}</div>
+  return`<div class="rkcard" data-rank="${k}"><div class="rkcov">${cov(R.id,d.title,"ring"+R.ar)}</div>
   <div class="rkt">${esc(d.title)}</div><div class="rkart">${esc(d.artist)} · ${esc((d.year||"").slice(0,4))}</div>
   <div class="rkbadges"><span class="pill r${R.ar}">Album ${RN[R.ar]}</span>${R.firstArtist?'<span class="new">Nouvelle popstar</span>':""}${R.isNew?'<span class="new">Nouvel album</span>':'<span class="old">Déjà dans ta collection</span>'}</div>
   <div class="rkprog"><div class="row"><span class="mut">Complétion</span><b>${R.before} / ${n}</b></div><div class="bar"><i style="width:${R.before/n*100}%"></i></div></div>
-  <button class="btn big" data-rank="${k}">Garder ce CD</button></div>`;
+  <button class="btn big" data-rank="${k}">${rank&&rank._mode=="chaos"?"Choisir":"Garder ce CD"}</button></div>`;
 }
 function showRank(){
   document.getElementById("stage").innerHTML="";
-  document.getElementById("res2").innerHTML='<div class="rkinfo">Choisis le CD que tu gardes<div class="mut" style="font-weight:500;margin-top:2px">Tu découvres ses chansons après. L’autre CD est perdu.</div></div><div class="rkgrid">'+rankCard(rank.A,"A")+rankCard(rank.B,"B")+'</div>';
+  const ks=rankKeys(),chaos=rank._mode=="chaos";
+  document.getElementById("res2").innerHTML=chaos
+   ?'<div class="rkinfo chaosinfo">Mode Chaos<div class="mut" style="font-weight:600;margin-top:2px">Choisis 1 CD sur 4. Quel que soit ton choix, <b>+2 chansons offertes</b> !</div></div><div class="rkgrid four">'+ks.map(k=>rankCard(rank[k],k)).join("")+'</div>'
+   :'<div class="rkinfo">Choisis le CD que tu gardes<div class="mut" style="font-weight:500;margin-top:2px">Tu découvres ses chansons après. L’autre CD est perdu.</div></div><div class="rkgrid">'+ks.map(k=>rankCard(rank[k],k)).join("")+'</div>';
 }
 function chooseRank(k){
   if(!rank||!rank[k])return;
   const R=rank[k];applyRoll(R);rank=null;delete meta.rankPending;
-  R.done=false;pending=R;lastRes=null;save();regen();
-  renderPack();                                   // le CD choisi apparaît scellé…
-  setTimeout(()=>{const cd=document.getElementById("cd");if(cd)cd.click()},350);   // …et s'ouvre tout seul : pochette, effets, puis les chansons
+  R.done=true;R.choix=true;pending=R;lastRes=R;save();regen();updPackBtn();
+  revealChosen(R);                                 // pas de CD ni de pochette : tu l'as déjà vue, on passe directement aux chansons
   ensurePhotos([R.d.artist]);
 }
-document.addEventListener("click",e=>{const x=e.target.closest("[data-rank]");if(x&&tab==0)chooseRank(x.dataset.rank)});
+const chosenHead=R=>{const b=R.base??R.pulls.length;return`<div class="chosenhead t${R.ar}c">Album ${RN[R.ar]} · ${R.pulls.length} titre${R.pulls.length>1?"s":""}${b>2?" · "+BONUS[Math.min(6,b)].n+" !":""}${R.extra?" · +"+R.extra+" Chaos":""}</div>`};
+async function revealChosen(R){
+  const d=db[R.id],box=document.getElementById("res2"),stg=document.getElementById("stage");if(!box)return;
+  if(stg)stg.innerHTML="";
+  box.innerHTML=chosenHead(R)+'<div class="got" id="got"></div>';
+  const my=++token,ok=()=>my==token&&tab==0&&document.getElementById("got");
+  window.scrollTo(0,0);
+  if(R.isNew){confetti(R.firstArtist?55:28);[0,4,7,12].forEach((n,i)=>setTimeout(()=>beep(523*Math.pow(2,n/12),.2,"triangle",.1),i*90));buzz([30,30,30,60])}
+  if((R.base??R.pulls.length)>2){await bonusFX(R.base??R.pulls.length,true);if(!ok())return}
+  if(R.extra){confetti(30);[0,7,12,19,24].forEach((n,i)=>setTimeout(()=>beep(392*Math.pow(2,n/12),.18,"square",.06),i*80))}
+  for(const p of R.pulls){
+    if(!ok())return;
+    document.getElementById("got").insertAdjacentHTML("beforeend",rowHTML(R,p,d));
+    if(p.dup)beep(300,.12,"sawtooth",.05);else chime(p.sr);
+    if(p.sr==4)confetti(60);else if(p.sr==3)confetti(18);
+    buzz(p.sr>=3?[20,40,20]:12);await sleep(p.sr>=3?500:200);
+  }
+  if(!ok())return;
+  box.insertAdjacentHTML("beforeend",sumHTML(R,d));
+  if(R.complete){confetti(90);[0,4,7,12].forEach((n,i)=>setTimeout(()=>beep(523*Math.pow(2,n/12),.25,"triangle",.12),i*140))}
+  ensurePhotos([d.artist]).then(c=>{if(c&&ok()&&lastRes===R){const m=box.querySelector(".sum .ph");if(m)m.outerHTML=ph(d.artist)}});
+  regen();updPackBtn();
+}
+document.addEventListener("click",e=>{
+  if(pending&&pending.busy&&!pending.done&&pending.skip&&tab==0&&performance.now()-(pending.t0||0)>350&&e.target.closest("#stage,#res2")&&!e.target.closest("[data-ar],[data-rg],[data-gotoalb]")){pending.skip();fxClear();return}
+  const st=e.target.closest("[data-star]");if(st){starQ=st.dataset.star;tab=2;render();window.scrollTo(0,0);return}
+  if(e.target.closest("[data-skip]")&&pending&&pending.skip){pending.skip();fxClear();e.target.closest("[data-skip]").remove();return}
+  const g=e.target.closest("[data-gotoalb]");if(g){nav={a:null,rg:g.dataset.gotoalb};tab=1;render();window.scrollTo(0,0);return}
+  const x=e.target.closest("[data-rank]");if(x&&tab==0)chooseRank(x.dataset.rank)});
 /* ---------- COLLECTION (façon Apple Music) ---------- */
 function renderColl(){
   const ids=Object.keys(db);
@@ -736,8 +824,8 @@ function renderColl(){
   let tot=0,got=0;ids.forEach(i=>{tot+=db[i].tracks.length;got+=db[i].got.length});
   if(nav.rg){
     const d=db[nav.rg],p=d.tracks.length?d.got.length/d.tracks.length*100:0,ar=rar(d.n||0,ALB_T);
-    app.innerHTML=`<button class="back" data-nav="${nav.a?"artist":"home"}">‹ ${nav.a?esc(d.artist):"Albums"}</button>
-    <div class="ahead">${cov(nav.rg,d.title,"ring"+ar)}<div><h3>${esc(d.title)}</h3><div class="mut">${esc(d.artist)}<br>${esc(d.kind||"")} · ${esc((d.year||"").slice(0,4))}${d.n?` · ${fmt(d.n)} streams`:""}</div><div style="margin:8px 0"><span class="pill r${ar}">Album ${RN[ar]}</span></div><div class="mut">${d.got.length}/${d.tracks.length}${p==100?" · complété":""}</div></div></div>
+    app.innerHTML=crumbs([{t:"Albums",a:'data-nav="home"'},{t:d.artist,a:'data-ar="'+esc(d.artist)+'"'},{t:d.title}])+`
+    <div class="ahead">${cov(nav.rg,d.title,"ring"+ar)}<div><h3>${esc(d.title)}</h3><div class="mut"><button class="lnk" data-ar="${esc(d.artist)}">${esc(d.artist)} ›</button><br>${esc(d.kind||"")} · ${esc((d.year||"").slice(0,4))}${d.n?` · ${fmt(d.n)} streams`:""}</div><div style="margin:8px 0"><span class="pill r${ar}">Album ${RN[ar]}</span></div><div class="mut">${d.got.length}/${d.tracks.length}${p==100?" · complété":""}</div></div></div>
     <div class="bar"><i style="width:${p}%"></i></div>`+
     (d.got.length?`<button class="btn sm alt" style="margin:12px 0 0;display:block" data-addpl="${nav.rg}|*">Ajouter l’album à une playlist</button>`:"")+
     (isComplete(d)?(!isFav(nav.rg)&&(meta.fav||[]).length>=MAXFAV?`<button class="btn favbtn" disabled>Hall of Fame plein (${MAXFAV}/${MAXFAV}) : retire un album du Profil</button>`:`<button class="btn favbtn ${isFav(nav.rg)?"":"gold"}" data-fav="${nav.rg}">${isFav(nav.rg)?"Retirer du Hall of Fame":"Exposer dans mon Hall of Fame"}</button>`):`<div class="mut" style="margin:12px 0 2px">Complète l’album pour l’exposer dans ton Hall of Fame.</div>`)+
@@ -748,8 +836,8 @@ function renderColl(){
   if(nav.a){
     const al=by[nav.a].sort((x,y)=>(db[x].year||"").localeCompare(db[y].year||""));
     let g=0,t=0;al.forEach(i=>{g+=db[i].got.length;t+=db[i].tracks.length});
-    app.innerHTML=`<button class="back" data-nav="home">‹ Albums</button>
-    <div class="ahead">${ph(nav.a)}<div><h3>${esc(nav.a)}</h3><div class="mut">${al.length} sortie${al.length>1?"s":""} · ${g} titres</div></div></div>
+    app.innerHTML=crumbs([{t:"Albums",a:'data-nav="home"'},{t:nav.a}])+`
+    <div class="ahead">${ph(nav.a)}<div><h3>${esc(nav.a)}</h3><div class="mut">${al.length} sortie${al.length>1?"s":""} · ${g} titres</div><button class="lnk" style="margin-top:6px" data-star="${esc(nav.a)}">Voir dans Popstars ›</button></div></div>
     <div class="grid" style="margin-top:14px">${al.map(id=>{const d=db[id],ar=rar(d.n||0,ALB_T);return`<div class="tile" data-rg="${id}"><div style="position:relative">${cov(id,d.title,"ring"+ar)}<span class="badge">${d.got.length}/${d.tracks.length}</span></div><div class="nm">${esc(d.title)}</div><div class="mut">${esc((d.year||"").slice(0,4))} · ${esc(d.kind||"")}</div></div>`}).join("")}</div>`;
     ensurePhotos([nav.a]).then(c=>{if(c&&tab==1&&nav.a&&!nav.rg)renderColl()});
     return;
@@ -916,7 +1004,7 @@ function renderPlaylists(){
   cur.songs=cur.songs.filter(([rg,i])=>songInfo(rg,i)); // retire les chansons qui ne sont plus dans la collection
   if(pl.tview)return renderTournament(cur);
   const songs=plSongs(cur);
-  let h=`<button class="back" data-pl="back">‹ Playlists</button>
+  let h=crumbs([{t:"Playlists",a:'data-pl="back"'},{t:cur.name}])+`
   <div class="plhead">${mosaicHTML(cur)}<div style="min-width:0">${pl.ren?`<div class="renrow"><input id="plname" value="${esc(cur.name)}" maxlength="40" autocomplete="off"><button class="btn sm" data-pl="rensave">OK</button></div>`:`<h3>${esc(cur.name)}</h3>`}<div class="mut">${songs.length} chanson${songs.length>1?"s":""} · ${new Set(songs.map(s=>s.artist)).size} artiste${new Set(songs.map(s=>s.artist)).size>1?"s":""}</div>${pl.ren?"":`<button class="linkbtn" data-pl="rename">Renommer</button>`}</div></div>
   <div class="plbtns"><button class="btn sm" data-pl="add">${pl.add?"Fermer":"Ajouter des chansons"}</button><button class="btn sm alt" data-pl="export">${pl.exp?"Fermer l’export":"Exporter"}</button><button class="btn sm alt" data-pl="tour">Ranking</button>${pl.cdel?`<button class="btn sm" data-pl="delok">Confirmer la suppression</button><button class="btn sm alt" data-pl="delno">Annuler</button>`:`<button class="btn sm danger" data-pl="del">Supprimer</button>`}</div>${pl.cdel?`<div class="mut" style="margin:2px 0 6px">Tes chansons restent dans ta collection.</div>`:""}`;
   if(pl.exp){
@@ -968,11 +1056,11 @@ document.addEventListener("click",async e=>{
     renderPlaylists();window.scrollTo(0,0);return}
   if(a=="tourundo"){if(cur.tour&&tourUndo(cur.tour)){save();renderPlaylists()}return}
   if(a=="tourredo"){cur.tour=null;pl.tsetup=true;save();renderPlaylists();return}
-  if(a=="tourimg"){
-    const box=document.getElementById("tourimgbox");if(!box||!cur.tour)return;box.innerHTML='<div class="mut">Création de l’image…</div>';
-    const r=await makeTourImage(cur,cur.tour);tourBlob=r.blob;
+  if(a=="tourimg"||a=="tourimg2"){
+    const box=document.getElementById("tourimgbox");if(!box||!cur.tour)return;box.innerHTML='<div class="mut">Création de l’image… (quelques secondes pour un grand tableau)</div>';
+    const r=a=="tourimg2"?await makeTourPodiumImage(cur,cur.tour):await makeTourImage(cur,cur.tour);tourBlob=r.blob;
     box.innerHTML=`<img src="${r.url}" alt="Classement de ${esc(cur.name)}"><div class="plbtns" style="justify-content:center"><button class="btn sm" data-pl="tourdl">Télécharger l’image</button>${navigator.canShare&&navigator.canShare({files:[new File([r.blob],"x.png",{type:"image/png"})]})?'<button class="btn sm alt" data-pl="toursh">Partager</button>':""}</div>`;return}
-  if(a=="tourdl"&&tourBlob){const u=URL.createObjectURL(tourBlob),l=document.createElement("a");l.href=u;l.download="classement-"+fileName(cur)+".png";document.body.appendChild(l);l.click();setTimeout(()=>{URL.revokeObjectURL(u);l.remove()},600);return}
+  if(a=="tourdl"&&tourBlob){const u=URL.createObjectURL(tourBlob),l=document.createElement("a");l.href=u;l.download="ranking-"+fileName(cur)+".png";document.body.appendChild(l);l.click();setTimeout(()=>{URL.revokeObjectURL(u);l.remove()},600);return}
   if(a=="toursh"&&tourBlob){try{await navigator.share({files:[new File([tourBlob],"classement.png",{type:"image/png"})],title:"Mon classement PopDex"})}catch(e){}return}
   if(a=="add"){pl.add=!pl.add;pl.exp=false;renderPlaylists();return}
   if(a=="export"){pl.exp=!pl.exp;pl.add=false;renderPlaylists();return}
@@ -1030,12 +1118,12 @@ function newTourney(keys,random){
   for(let b=0;b<byes;b++)pairs.push([items[k++],null]);          // « passe-droits » : ces chansons avancent sans adversaire
   while(k<n){pairs.push([items[k],items[k+1]]);k+=2}
   if(random)pairs=shuf(pairs);                                     // passe-droits répartis au hasard dans le tableau
-  const T={n,P,size:P,pairs,idx:0,winners:[],elim:[],played:0,total:n-1,done:false,hist:[]};
+  const T={n,P,size:P,pairs,idx:0,winners:[],elim:[],rec:[],played:0,total:n-1,done:false,hist:[]};
   tourSkipByes(T);return T;
 }
 function tourSkipByes(T){
   while(!T.done){
-    while(T.idx<T.pairs.length&&(T.pairs[T.idx][0]===null||T.pairs[T.idx][1]===null)){const p=T.pairs[T.idx];T.winners.push(p[0]===null?p[1]:p[0]);T.idx++}
+    while(T.idx<T.pairs.length&&(T.pairs[T.idx][0]===null||T.pairs[T.idx][1]===null)){const p=T.pairs[T.idx],w=p[0]===null?p[1]:p[0];T.winners.push(w);if(T.rec)T.rec.push({s:T.size,a:p[0],b:p[1],w});T.idx++}
     if(T.idx<T.pairs.length)return;                                // un vrai duel t'attend
     if(T.winners.length==1){T.done=true;T.champion=T.winners[0];return}
     const w=T.winners;T.pairs=[];for(let i=0;i<w.length;i+=2)T.pairs.push([w[i],w[i+1]]);
@@ -1045,7 +1133,7 @@ function tourSkipByes(T){
 function tourPick(T,side){
   const {hist,...snap}=T;hist.push(JSON.stringify(snap));
   const [a,b]=T.pairs[T.idx],win=side==0?a:b,lose=side==0?b:a;
-  T.winners.push(win);T.elim.push({k:lose,size:T.size});T.idx++;T.played++;
+  T.winners.push(win);T.elim.push({k:lose,size:T.size});if(T.rec)T.rec.push({s:T.size,a,b,w:win});T.idx++;T.played++;
   tourSkipByes(T);
 }
 function tourUndo(T){
@@ -1070,7 +1158,7 @@ function renderTournament(cur){
     const all=[...T.pairs.flat(),...T.winners,...T.elim.map(e=>e.k),T.champion].filter(Boolean);
     if(all.some(k=>!songByKey(k))){cur.tour=null;T=null}
   }
-  const back=`<button class="back" data-pl="tourquit">‹ ${esc(cur.name)}</button>`;
+  const back=crumbs([{t:"Playlists",a:'data-pl="back"'},{t:cur.name,a:'data-pl="tourquit"'},{t:"Ranking"}]);
   if(!T||pl.tsetup){
     const n=keys.length,big=n>MAXTOUR;
     app.innerHTML=`${back}<h1 class="pt" style="margin-top:6px">Ranking</h1><div class="sub0">Classe les chansons de « ${esc(cur.name)} » par duels, comme un tournoi de tennis : à chaque duel, tu choisis ta préférée, et la gagnante passe au tour suivant.</div>
@@ -1086,7 +1174,7 @@ function renderTournament(cur){
     app.innerHTML=`${back}<div class="tourwin"><div class="crown">✦ Ta chanson préférée ✦</div><div class="frame big"><div class="mat">${cov(w.rg,w.album)}</div></div><h3>${esc(w.t)}</h3><div class="mut">${esc(w.artist)} · ${esc(w.album)}</div><div style="margin-top:8px"><span class="pill r${w.sr}">${RN[w.sr]}</span></div></div>
     <h2>Classement</h2>${show.map(r=>{const s=songByKey(r.k);return s?`<div class="rkrow"><span class="rk">${rankLabel(r)}${r.tie?"<small>=</small>":""}</span>${cov(s.rg,s.album)}<div class="x"><b>${esc(s.t)}</b><span>${esc(s.artist)}</span></div></div>`:""}).join("")}
     ${rk.length>10?`<div class="mut" style="padding:8px 0">… et ${rk.length-10} autres chansons.</div>`:""}
-    <div class="plbtns"><button class="btn" data-pl="tourimg">Créer l’image</button><button class="btn alt" data-pl="tourredo">Refaire un tournoi</button></div><div class="tourimg" id="tourimgbox"></div>`;
+    <div class="plbtns"><button class="btn" data-pl="tourimg">Créer l’image du tableau</button><button class="btn alt" data-pl="tourimg2">Image podium</button><button class="btn alt" data-pl="tourredo">Refaire un tournoi</button></div><div class="tourimg" id="tourimgbox"></div>`;
     return;
   }
   const [a,b]=T.pairs[T.idx];
@@ -1095,7 +1183,92 @@ function renderTournament(cur){
   <div class="mut" style="text-align:center;margin:6px 0 10px">Touche la chanson que tu préfères.</div>
   <div class="plbtns" style="justify-content:center">${T.hist.length?`<button class="btn sm alt" data-pl="tourundo">Annuler le dernier choix</button>`:""}<button class="btn sm danger" data-pl="tourquit">Quitter (on garde ta progression)</button></div>`;
 }
-// ----- image du classement (PNG 1080 × 1350) -----
+
+// ----- image du TABLEAU du tournoi : deux moitiés qui convergent vers la finale, traits entre les duels -----
+const fitText=(x,t,maxW)=>{t=String(t);if(x.measureText(t).width<=maxW)return t;while(t.length>1&&x.measureText(t+"…").width>maxW)t=t.slice(0,-1);return t+"…"};
+async function makeTourImage(cur,T){
+  if(!T.rec||!T.rec.length||T.P<4)return makeTourPodiumImage(cur,T);   // anciens tournois (sans historique des duels) ou 2 chansons
+  const P=T.P,R=Math.round(Math.log2(P)),half=P/2;
+  const recBy={};T.rec.forEach(m=>(recBy[m.s]=recBy[m.s]||[]).push(m));
+  const rounds=[];for(let r=0;r<R;r++)rounds.push(recBy[P/Math.pow(2,r)]||[]);
+  const comp=[[]];rounds[0].forEach(m=>comp[0].push(m.a,m.b));
+  for(let r=1;r<R;r++)comp[r]=rounds[r-1].map(m=>m.w);
+  const champ=T.champion;
+  // dimensions selon la taille du tableau
+  const rh=half<=4?112:half<=8?84:half<=16?62:half<=32?46:34,sw=half<=8?380:half<=16?330:half<=32?290:256,gap=36,margin=56,cw=520;
+  const fs=Math.max(13,Math.floor(rh*0.36)),thumb=rh-12;
+  const W=2*margin+2*R*sw+2*(R-1)*gap+cw,headerH=300,footerH=110;
+  const bracketH=half*rh,innerH=Math.max(bracketH,640),H=headerH+innerH+footerH,ytop=headerH+(innerH-bracketH)/2;
+  const xL=r=>margin+r*(sw+gap),xR=r=>W-margin-sw-r*(sw+gap);
+  // positions verticales (par côté, indices locaux)
+  const Y=[];Y[0]=Array.from({length:half},(_,i)=>ytop+i*rh+rh/2);
+  for(let r=1;r<R;r++){Y[r]=[];for(let j=0;j<Y[r-1].length/2;j++)Y[r][j]=(Y[r-1][2*j]+Y[r-1][2*j+1])/2}
+  const yc=Y[R-1][0];
+  // pochettes
+  const keys=[...new Set(comp.flat().filter(Boolean))],rgOf=k=>k.split(":")[0],rgs=[...new Set(keys.map(rgOf))];
+  const imgs={};for(let i=0;i<rgs.length;i+=10){const chunk=rgs.slice(i,i+10);const got=await Promise.all(chunk.map(rg=>loadImg(COVER(rg))));chunk.forEach((rg,k)=>imgs[rg]=got[k])}
+  const c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
+  const bg=x.createRadialGradient(W/2,0,100,W/2,H*.35,Math.max(W,H));bg.addColorStop(0,"#3a2c0a");bg.addColorStop(.45,"#14100a");bg.addColorStop(1,"#06050a");x.fillStyle=bg;x.fillRect(0,0,W,H);
+  // en-tête
+  x.textAlign="center";x.fillStyle="#d4a017";x.font="800 34px system-ui,sans-serif";x.fillText("✦  M O N   R A N K I N G  ✦",W/2,92);
+  x.fillStyle="#fff7cf";x.font="800 92px system-ui,sans-serif";x.fillText(fitText(x,cur.name,W-200),W/2,190);
+  x.fillStyle="#bfa66a";x.font="500 30px system-ui,sans-serif";x.fillText(T.n+" chansons  ·  "+T.total+" duels  ·  tableau à élimination directe",W/2,246);
+  const LINE="#6b5a2e",GOLD="#ffd75e";
+  const line=(x1,y1,x2,y2,col,w)=>{x.strokeStyle=col;x.lineWidth=w;x.beginPath();x.moveTo(x1,y1);x.lineTo(x2,y2);x.stroke()};
+  const lw=Math.max(2,rh/22);
+  // connecteurs (dessinés avant les cases)
+  for(const side of [0,1]){
+    for(let r=0;r<R-1;r++){
+      const cnt=Y[r].length;
+      for(let j=0;j<cnt/2;j++){
+        const yA=Y[r][2*j],yB=Y[r][2*j+1],yM=Y[r+1][j];
+        const gi=side==0?2*j:cnt+2*j;                        // index global du 1er concurrent du duel
+        const m=rounds[r][Math.floor(gi/2)],champWon=m&&m.w===champ;
+        const xa=side==0?xL(r)+sw:xR(r),xn=side==0?xL(r+1):xR(r+1)+sw,xm=side==0?xa+gap/2:xa-gap/2;
+        line(xa,yA,xm,yA,LINE,lw);line(xa,yB,xm,yB,LINE,lw);line(xm,yA,xm,yB,LINE,lw);line(xm,yM,xn,yM,LINE,lw);
+        if(champWon){const yW=(m.a===champ)?yA:yB;line(xa,yW,xm,yW,GOLD,lw*1.6);line(xm,yW,xm,yM,GOLD,lw*1.6);line(xm,yM,xn,yM,GOLD,lw*1.6)}
+      }
+    }
+    // finaliste -> centre
+    const xa=side==0?xL(R-1)+sw:xR(R-1),xc=W/2,fm=rounds[R-1][0];
+    const gold=fm&&fm.w===champ&&((side==0&&fm.a===champ)||(side==1&&fm.b===champ));
+    line(xa,yc,xc,yc,gold?GOLD:LINE,gold?lw*1.6:lw);
+  }
+  // cases
+  for(let r=0;r<R;r++){
+    const cnt=comp[r].length/2;
+    for(const side of [0,1]){
+      for(let j=0;j<cnt;j++){
+        const g=side==0?j:cnt+j,key=comp[r][g],yy=Y[r][j],bx=side==0?xL(r):xR(r),by=yy-rh/2+3,bh=rh-6;
+        x.save();
+        if(!key){x.setLineDash([6,6]);x.strokeStyle="#2c2618";x.lineWidth=2;x.strokeRect(bx,by,sw,bh);x.restore();continue}
+        const m=rounds[r][Math.floor(g/2)],adv=m&&m.w===key,isChamp=key===champ&&adv;
+        x.fillStyle=isChamp?"#2a210c":"#17130b";x.strokeStyle=isChamp?GOLD:adv?"#8a6d1a":"#3b3221";x.lineWidth=isChamp?3:2;
+        if(isChamp){x.shadowColor="#ffd75e";x.shadowBlur=14}
+        x.beginPath();x.roundRect?x.roundRect(bx,by,sw,bh,8):x.rect(bx,by,sw,bh);x.fill();x.stroke();x.shadowBlur=0;
+        const sg=songByKey(key),im=imgs[rgOf(key)];
+        const tx=bx+8;
+        if(im)x.drawImage(im,tx,by+(bh-thumb)/2,thumb,thumb);else{const h=hue(sg?sg.album:key);x.fillStyle=`hsl(${h} 60% 45%)`;x.fillRect(tx,by+(bh-thumb)/2,thumb,thumb)}
+        x.textAlign="left";x.textBaseline="middle";x.font=`${adv?"700":"500"} ${fs}px system-ui,sans-serif`;x.fillStyle=adv?"#fff":"#8e8269";
+        x.fillText(fitText(x,sg?sg.t:"?",sw-thumb-26),tx+thumb+8,yy);
+        x.restore();
+      }
+    }
+  }
+  // champion au centre
+  const cw2=songByKey(champ),cs=Math.min(360,cw-100),cx=W/2-cs/2,cy=yc-cs/2-10,fr=12;
+  x.textAlign="center";x.textBaseline="alphabetic";
+  const gg=x.createLinearGradient(cx,cy,cx+cs,cy+cs);gg.addColorStop(0,"#fff1b0");gg.addColorStop(.3,"#b8860b");gg.addColorStop(.6,"#f6dc7a");gg.addColorStop(1,"#8a5d0a");
+  x.shadowColor="#ffd75e88";x.shadowBlur=40;x.fillStyle=gg;x.fillRect(cx-fr,cy-fr,cs+2*fr,cs+2*fr);x.shadowBlur=0;x.fillStyle="#0d0b08";x.fillRect(cx-fr+6,cy-fr+6,cs+2*fr-12,cs+2*fr-12);
+  const ci=imgs[rgOf(champ)];if(ci)x.drawImage(ci,cx,cy,cs,cs);else{x.fillStyle=`hsl(${hue(cw2.album)} 60% 45%)`;x.fillRect(cx,cy,cs,cs)}
+  x.fillStyle="#d4a017";x.font="800 28px system-ui,sans-serif";x.fillText("✦  N°1  ✦",W/2,cy-fr-22);
+  x.fillStyle="#fff";x.font="800 38px system-ui,sans-serif";x.fillText(fitText(x,cw2.t,cw-40),W/2,cy+cs+fr+54);
+  x.fillStyle="#cdb98a";x.font="500 26px system-ui,sans-serif";x.fillText(fitText(x,cw2.artist,cw-40),W/2,cy+cs+fr+92);
+  x.fillStyle="#8d7a4a";x.font="500 26px system-ui,sans-serif";x.fillText("PopDex  ·  "+new Date().toLocaleDateString("fr-FR"),W/2,H-42);
+  return new Promise(res=>c.toBlob(b=>res({blob:b,url:c.toDataURL("image/png")}),"image/png"));
+}
+
+// ----- image du classement (version podium, PNG 1080 × 1350) -----
 let tourBlob=null;
 const loadImg=url=>new Promise(res=>{const im=new Image();im.crossOrigin="anonymous";im.onload=()=>res(im);im.onerror=()=>res(null);im.src=url;setTimeout(()=>res(null),12000)});
 function wrapText(ctx,text,x,y,maxW,lh,maxLines){
@@ -1104,7 +1277,7 @@ function wrapText(ctx,text,x,y,maxW,lh,maxLines){
   lines.push(line);if(lines.length>maxLines){lines=lines.slice(0,maxLines);lines[maxLines-1]=lines[maxLines-1].replace(/\s*\S*$/,"")+"…"}
   lines.forEach((l,i)=>ctx.fillText(l,x,y+i*lh));return lines.length*lh;
 }
-async function makeTourImage(cur,T){
+async function makeTourPodiumImage(cur,T){
   const W=1080,H=1350,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
   const rk=tourRanking(T),infos=rk.map(r=>({r,s:songByKey(r.k)})).filter(o=>o.s);
   const imgs=await Promise.all(infos.slice(0,4).map(o=>loadImg(COVER(o.s.rg))));
