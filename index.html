@@ -66,6 +66,8 @@ h2{margin:22px 0 10px;font-size:20px;letter-spacing:-.3px}
 .tile .nm{font-size:13px;font-weight:600;margin-top:7px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tile .mut{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tile.lock .ph,.tile.lock .cov{filter:grayscale(1) opacity(.45)}
+.tile.lock .ph.diva{filter:none}
+.tile.lock .ph.diva img{filter:grayscale(1) opacity(.5)}
 .badge{position:absolute;right:6px;bottom:6px;background:#000a;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;z-index:2}
 .ahead{display:flex;gap:16px;align-items:center;margin:8px 0 10px}
 .ahead .ph{width:96px;flex:none}.ahead .cov{width:132px;flex:none;border-radius:10px}
@@ -348,6 +350,21 @@ body.shake2{animation:bodyshake .55s 3}
 .chaosinfo .mut{-webkit-text-fill-color:var(--mut);text-transform:none;letter-spacing:0;font-size:14px}
 .chaosinfo b{-webkit-text-fill-color:#ffb300}
 .bonustag.chaos{background:linear-gradient(90deg,#ff3d3d,#ff8a00,#ffd000);color:#1a0a00}
+
+/* DIVAS : cercle platine autour de la photo */
+.ph.diva{box-shadow:0 0 0 3px var(--bg),0 0 0 8px #eef0fa,0 0 0 10px #8b90a8,0 0 24px 8px #e9e6ffaa;animation:platglow 3.2s ease-in-out infinite}
+@keyframes platglow{0%,100%{box-shadow:0 0 0 3px var(--bg),0 0 0 8px #eef0fa,0 0 0 10px #8b90a8,0 0 18px 6px #e9e6ff77}50%{box-shadow:0 0 0 3px var(--bg),0 0 0 8px #fff,0 0 0 10px #a2a8c4,0 0 32px 12px #e9e6ffcc}}
+.tile .ph.diva{margin:10px;width:calc(100% - 20px)}
+.divatag{display:inline-block;margin:2px 0 4px;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#2a2a3a;background:linear-gradient(100deg,#fff,#cfd4ff,#fff,#d8f7ff,#fff);box-shadow:0 0 0 1px #0002,0 0 10px #e9e6ff88}
+.divadot{display:inline-block;width:12px;height:12px;border-radius:50%;border:2.5px solid #eef0fa;box-shadow:0 0 0 1.5px #8b90a8,0 0 8px #e9e6ffcc;vertical-align:-2px;margin-right:4px}
+@media(prefers-reduced-motion:reduce){.ph.diva{animation:none}}
+
+/* solde de pièces : limite en petit + compte à rebours */
+#coins{flex-direction:column;align-items:flex-start;gap:0;padding:5px 13px;line-height:1.15}
+#coins .cn{display:flex;align-items:center}
+#coins .cmax{font-size:11px;font-weight:600;color:var(--mut);margin-left:2px;align-self:flex-end;padding-bottom:1px}
+#coins .rg{font-size:10.5px;font-weight:600;color:var(--mut);font-variant-numeric:tabular-nums;margin-left:1px}
+.btn small.rgbtn{display:block;font-size:11px;font-weight:600;opacity:.9;margin-top:1px;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -399,7 +416,28 @@ const fmt=n=>n>=1e9?(n/1e9).toFixed(2).replace(".",",")+" Md":n>=1e6?(n>=1e8?Mat
 const norm=s=>String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g," ").trim();
 const normB=s=>norm(String(s).replace(/\(.*?\)|\[.*?\]/g,""));
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-function regen(){const n=Math.floor((Date.now()-meta.t)/REGEN_MS);if(n>0){if(meta.coins<MAXFREE)meta.coins=Math.min(MAXFREE,meta.coins+n*REGEN_COINS);meta.t+=n*REGEN_MS}document.getElementById("coins").innerHTML='<i class="coin"></i>'+meta.coins}
+function regen(){
+  if(meta.coins>=MAXFREE){meta.t=Date.now()}   // au maximum : le chrono ne tourne pas, il démarre dès que tu dépenses
+  else{
+    const n=Math.floor((Date.now()-meta.t)/REGEN_MS);
+    if(n>0){meta.coins=Math.min(MAXFREE,meta.coins+n*REGEN_COINS);meta.t+=n*REGEN_MS;if(meta.coins>=MAXFREE)meta.t=Date.now()}
+  }
+  paintCoins();
+}
+// temps restant avant les prochaines pièces (null si tu es au maximum)
+const nextCoinIn=()=>meta.coins>=MAXFREE?null:Math.max(0,REGEN_MS-(Date.now()-meta.t));
+const fmtClock=ms=>{const t=Math.ceil(ms/1000),h=Math.floor(t/3600),m=Math.floor(t%3600/60),sec=t%60;return(h?h+":"+String(m).padStart(2,"0"):m)+":"+String(sec).padStart(2,"0")};
+function paintCoins(){
+  const el=document.getElementById("coins");if(!el)return;const w=nextCoinIn();
+  el.innerHTML='<span class="cn"><i class="coin"></i>'+meta.coins+'<small class="cmax">/'+MAXFREE+'</small></span>'+(w===null?"":'<span class="rg" id="rgtxt">+'+REGEN_COINS+' dans '+fmtClock(w)+'</span>');
+}
+function tickCoins(){ // toutes les secondes : on met à jour le décompte (et on crédite les pièces quand il arrive à zéro)
+  const w=nextCoinIn();
+  if(w!==null&&w<=0){regen();save();if(tab==0)updPackBtn();return}
+  const t=document.getElementById("rgtxt");if(t&&w!==null)t.textContent="+"+REGEN_COINS+" dans "+fmtClock(w);
+  document.querySelectorAll(".rgbtn").forEach(e=>{if(w!==null)e.textContent="+"+REGEN_COINS+" dans "+fmtClock(w)});
+}
+setInterval(tickCoins,1000);
 setInterval(()=>{regen();save();if(tab==0)updPackBtn()},5000);
 let chain=Promise.resolve();
 function mb(path){
@@ -426,7 +464,11 @@ async function lbPost(path,body){
 /* ---------- images ---------- */
 const cov=(rg,title,cls="")=>`<div class="cov nocov-wrap ${cls}" style="--h:${hue(title)}" data-t="${esc(title)}"><img src="${COVER(rg)}" loading="lazy" alt="" onerror="this.remove();this.parentNode&&0" ></div>`;
 document.addEventListener("error",e=>{const t=e.target;if(t.tagName=="IMG"&&t.closest(".cov"))t.closest(".cov").classList.add("nocov")},true);
-function ph(name,cls=""){const u=photos[name];return`<div class="ph ${cls}" style="--h:${hue(name)}">${u?`<img src="${esc(u)}" alt="" onerror="this.remove()">`:esc(name.split(/\s+/).map(w=>w[0]).join("").slice(0,2))}</div>`}
+// DIVAS : les popstars dont les albums du jeu cumulent plus de 30 milliards de streams ont un cercle platine autour de leur photo
+const DIVA_MIN=30e9;let _div=null;
+const divaMap=()=>{if(_div&&_div.n===(LIB.albums?Object.keys(LIB.albums).length:0))return _div.m;const m={};if(LIB.artists&&LIB.albums)for(const v of Object.values(LIB.artists)){const t=v.albums.reduce((s,id)=>s+(LIB.albums[id]?LIB.albums[id].n:0),0);m[v.name]=t}_div={n:LIB.albums?Object.keys(LIB.albums).length:0,m};return m};
+const artistTotal=name=>divaMap()[name]||0,isDiva=name=>artistTotal(name)>DIVA_MIN;
+function ph(name,cls=""){const u=photos[name];return`<div class="ph ${cls}${isDiva(name)?" diva":""}" style="--h:${hue(name)}">${u?`<img src="${esc(u)}" alt="" onerror="this.remove()">`:esc(name.split(/\s+/).map(w=>w[0]).join("").slice(0,2))}</div>`}
 async function ensurePhotos(names){
   const need=names.filter(n=>photos[n]===undefined);if(!need.length)return false;
   const wk={};roster().forEach(r=>wk[r.name]=r.wiki||r.name);
@@ -624,7 +666,7 @@ function updPackBtn(){const b=document.getElementById("open");if(!b)return;
   const rb=document.getElementById("rank");
   if(rb){rb.disabled=buying||!!rank||(!!pending&&!pending.done)||meta.coins<RANK_PRICE;rb.innerHTML=rank?"Choisis un CD":buying?"Fabrication…":`Mode Choix<span class="pr"><i class="coin"></i>${RANK_PRICE}</span><small>2 CD, tu en gardes 1</small>`}
   b.disabled=buying||!!rank||(!!pending&&!pending.done)||meta.coins<PRICE;
-  b.innerHTML=buying?"Fabrication du CD…":pending&&!pending.done?"Touche le CD pour l’ouvrir":meta.coins<PRICE?"Pas assez de pièces":`Acheter un CD<span class="pr"><i class="coin"></i>${PRICE}</span>`}
+  b.innerHTML=buying?"Fabrication du CD…":pending&&!pending.done?"Touche le CD pour l’ouvrir":meta.coins<PRICE?`Pas assez de pièces<small class="rgbtn">${nextCoinIn()===null?"":"+"+REGEN_COINS+" dans "+fmtClock(nextCoinIn())}</small>`:`Acheter un CD<span class="pr"><i class="coin"></i>${PRICE}</span>`}
 // Tirage d'un CD, calculé sans rien modifier : l'album, les chansons obtenues, les doublons, la complétion…
 function rollCD(cd,extra=0){
   const ar=rar(cd.n,ALB_T),ex=db[cd.rg],isNew=!ex;
@@ -837,7 +879,7 @@ function renderColl(){
     const al=by[nav.a].sort((x,y)=>(db[x].year||"").localeCompare(db[y].year||""));
     let g=0,t=0;al.forEach(i=>{g+=db[i].got.length;t+=db[i].tracks.length});
     app.innerHTML=crumbs([{t:"Albums",a:'data-nav="home"'},{t:nav.a}])+`
-    <div class="ahead">${ph(nav.a)}<div><h3>${esc(nav.a)}</h3><div class="mut">${al.length} sortie${al.length>1?"s":""} · ${g} titres</div><button class="lnk" style="margin-top:6px" data-star="${esc(nav.a)}">Voir dans Popstars ›</button></div></div>
+    <div class="ahead">${ph(nav.a)}<div><h3>${esc(nav.a)}</h3>${isDiva(nav.a)?`<div><span class="divatag">Diva · ${fmt(artistTotal(nav.a))} streams</span></div>`:""}<div class="mut">${al.length} sortie${al.length>1?"s":""} · ${g} titres</div><button class="lnk" style="margin-top:6px" data-star="${esc(nav.a)}">Voir dans Popstars ›</button></div></div>
     <div class="grid" style="margin-top:14px">${al.map(id=>{const d=db[id],ar=rar(d.n||0,ALB_T);return`<div class="tile" data-rg="${id}"><div style="position:relative">${cov(id,d.title,"ring"+ar)}<span class="badge">${d.got.length}/${d.tracks.length}</span></div><div class="nm">${esc(d.title)}</div><div class="mut">${esc((d.year||"").slice(0,4))} · ${esc(d.kind||"")}</div></div>`}).join("")}</div>`;
     ensurePhotos([nav.a]).then(c=>{if(c&&tab==1&&nav.a&&!nav.rg)renderColl()});
     return;
@@ -1306,7 +1348,7 @@ function renderStars(){
   const rs=roster().sort((a,b)=>a.name.localeCompare(b.name));
   const cnt=n=>Object.values(db).filter(d=>d.artist==n);
   const found=rs.filter(r=>cnt(r.name).length).length;
-  app.innerHTML=`<h1 class="pt">Popstars</h1><div class="sub0">${found} / ${rs.length} découvertes</div>
+  app.innerHTML=`<h1 class="pt">Popstars</h1><div class="sub0">${found} / ${rs.length} découvertes<div class="mut" style="margin-top:4px"><span class="divadot"></span> Cercle platine : <b>diva</b> (plus de 30 Md de streams sur ses albums)</div></div>
   <input id="q" type="search" placeholder="Rechercher une popstar ou un album" value="${esc(starQ)}" autocomplete="off"><div id="starsres"></div>`;
   const q=document.getElementById("q");
   const draw=()=>{
