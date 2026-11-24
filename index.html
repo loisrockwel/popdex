@@ -177,7 +177,7 @@ background:radial-gradient(circle,var(--bg) 0 14%,transparent 15%),conic-gradien
 .hofwrap::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(2px 2px at 12% 18%,#fff9,transparent),radial-gradient(2px 2px at 86% 12%,#ffe8a2cc,transparent),radial-gradient(1.5px 1.5px at 30% 40%,#fff8,transparent),radial-gradient(2px 2px at 92% 46%,#fff9,transparent),radial-gradient(1.5px 1.5px at 6% 62%,#ffe8a2cc,transparent),radial-gradient(2px 2px at 70% 78%,#fff8,transparent),radial-gradient(1.5px 1.5px at 20% 90%,#fff9,transparent),radial-gradient(2px 2px at 52% 8%,#ffe8a2cc,transparent);animation:twink 4s ease-in-out infinite}
 @keyframes twink{0%,100%{opacity:.35}50%{opacity:1}}
 @keyframes hofglow{0%,100%{opacity:.55}50%{opacity:1}}
-.hofgrid .tools{flex-direction:column;gap:4px}.hofgrid .tools button{font-size:9px;padding:2px 6px}
+.hofgrid .tools{flex-direction:column;gap:4px;align-items:center}.tools .mv{display:flex;gap:6px}.tools .mv button{font-size:13px;padding:2px 10px}.hofgrid .tools button{font-size:9px;padding:2px 6px}
 .hofstats{position:relative;display:flex;justify-content:center;gap:18px;margin-top:18px;color:#d4a017;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700}.hofstats b{display:block;color:#fff7cf;font-size:18px;letter-spacing:0;text-align:center}
 .hofshare{margin-top:16px}.hofshare img{width:100%;max-width:340px;display:block;margin:0 auto;border-radius:14px;box-shadow:0 10px 34px #000a}
 .hofcenter .crown{position:absolute;left:50%;top:-30px;transform:translateX(-50%);font-size:11px;letter-spacing:4px;color:#d4a017;font-weight:800;white-space:nowrap}
@@ -671,6 +671,7 @@ document.getElementById("snd").onclick=e=>{sound=!sound;try{localStorage.setItem
 function beep(f,d=.12,type="sine",v=.12){if(!sound)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
 const buzz=n=>{try{navigator.vibrate&&navigator.vibrate(n)}catch(e){}};
 
+try{if("serviceWorker"in navigator&&location.protocol!=="file:")navigator.serviceWorker.register("sw.js").catch(()=>{})}catch(e){}
 function albumCelebrate(P,d){ // célébration plein écran quand un album est complété
   document.querySelectorAll(".adone").forEach(e=>e.remove());
   const o=document.createElement("div");o.className="adone";
@@ -708,7 +709,7 @@ function updPackBtn(){const b=document.getElementById("open");if(!b)return;
   const rb=document.getElementById("rank");
   if(rb){rb.disabled=buying||!!rank||(!!pending&&!pending.done)||meta.coins<RANK_PRICE;rb.innerHTML=rank?"Choisis un CD":buying?"Fabrication…":`Mode Choix<span class="pr"><i class="coin"></i>${RANK_PRICE}</span><small>2 CD, tu en gardes 1</small>`}
   b.disabled=buying||!!rank||(!!pending&&!pending.done)||meta.coins<PRICE;
-  b.innerHTML=buying?"Fabrication du CD…":pending&&!pending.done?"Touche le CD pour l’ouvrir":meta.coins<PRICE?`Pas assez de pièces<small class="rgbtn">${nextCoinIn()===null?"":"+"+REGEN_COINS+" dans "+fmtClock(nextCoinIn())}</small>`:`Acheter un CD<span class="pr"><i class="coin"></i>${PRICE}</span>`}
+  b.innerHTML=buying?"Fabrication du CD…":pending&&!pending.done?"Ouverture du CD…":meta.coins<PRICE?`Pas assez de pièces<small class="rgbtn">${nextCoinIn()===null?"":"+"+REGEN_COINS+" dans "+fmtClock(nextCoinIn())}</small>`:`Acheter un CD<span class="pr"><i class="coin"></i>${PRICE}</span>`}
 // Tirage d'un CD, calculé sans rien modifier : l'album, les chansons obtenues, les doublons, la complétion…
 function rollCD(cd,extra=0){
   const ar=rar(cd.n,ALB_T),ex=db[cd.rg],isNew=!ex;
@@ -749,7 +750,7 @@ async function buyCD(){
   save();regen();showSealed();beep(330,.08);updPackBtn();prefetch();ensurePhotos([R.d.artist]);
 }
 function cdHTML(rg,title,sealed,isNew){return`<div class="cdwrap${isNew?" newalb":""}" id="cd" style="--h:${hue(title)}"><div class="tray" id="tray" data-t="${esc(title)}" style="background-image:url(${COVER(rg)})"></div><img src="${COVER(rg)}" alt="" style="display:none" onerror="this.parentNode.classList.add('nocov')"><div class="disc" id="disc"></div>${isNew?'<div class="ribbon">Nouvel album</div>':""}<div class="lid"><span>?</span></div>${sealed?'<div class="wrap">Touche pour ouvrir</div>':""}</div><div class="tier" id="tier"></div>`}
-function showSealed(){const d=db[pending.id];document.getElementById("stage").innerHTML=cdHTML(pending.id,d.title,true,pending.isNew);document.getElementById("res2").innerHTML="";const cd=document.getElementById("cd");cd.onclick=()=>tear(cd)}
+function showSealed(){const d=db[pending.id];document.getElementById("stage").innerHTML=cdHTML(pending.id,d.title,true,pending.isNew);document.getElementById("res2").innerHTML="";const cd=document.getElementById("cd");cd.onclick=()=>tear(cd);const P0=pending;setTimeout(()=>{if(pending===P0&&!P0.busy&&!P0.done&&document.getElementById("cd")===cd&&tab==0)tear(cd)},450)} // ouverture automatique
 const rowHTML=(P,p,d)=>`<div class="gs r${p.sr}">${cov(P.id,d.title)}<div class="x"><b>${esc(p.t)}</b><span class="sub"><span class="lnk2" data-ar="${esc(d.artist)}">${esc(d.artist)}</span> · <span class="lnk2" data-rg="${P.id}">${esc(d.title)}</span></span><span class="sub">${p.n?fmt(p.n)+" streams":"—"}</span></div><div class="tags"><span class="pill r${p.sr}">${RN[p.sr]}</span>${p.dup?`<span>Doublon +${DUPC[p.sr]}</span>`:'<span class="new">Nouveau</span>'}${(()=>{const i=P.pulls.indexOf(p),b=P.base??P.pulls.length;return i>=b?'<span class="bonustag chaos">Chaos</span>':i>=2?'<span class="bonustag">Bonus</span>':""})()}</div></div>`;
 const sumHTML=(P,d)=>{const left=d.tracks.length-d.got.length,pct=d.got.length/d.tracks.length*100;
   return`<div class="sum">${P.firstArtist?`<div class="l" style="margin-bottom:12px">${ph(d.artist)}<div class="sp"><span class="tag">Nouvelle popstar</span><br><b>${esc(d.artist)}</b></div></div>`:""}
@@ -760,7 +761,8 @@ const sumHTML=(P,d)=>{const left=d.tracks.length-d.got.length,pct=d.got.length/d
 async function tear(cd){
   if(pending.busy)return;pending.busy=true;const my=++token,P=pending,d=db[P.id],ok=()=>my==token;
   // vitesse : le mode Choix s'ouvre en accéléré ; « Passer » termine l'animation tout de suite
-  let skipRes;const skipP=new Promise(r=>skipRes=r);const F=P.fast?0.28:1;
+  let skipRes;const skipP=new Promise(r=>skipRes=r);P.fast=true;const F=0.2;   // CD classique : ouverture express, plus rapide que Choix et Chaos
+  
   P.skip=()=>{P.skipped=true;skipRes()};
   const nap=ms=>P.skipped?Promise.resolve():Promise.race([sleep(ms*F),skipP]);
   P.t0=performance.now();
@@ -1035,7 +1037,7 @@ function frameHTML(id,big,pos){
   const d=db[id],ar=rar(d.n||0,ALB_T);
   return`<div class="hofitem"><div class="frame ${big?"big":""}"><div class="mat">${cov(id,d.title)}</div></div>
   <div class="plaque"><b>${esc(d.title)}</b><span>${esc(d.artist)} · ${RN[ar]}</span></div>
-  ${hofEdit?`<div class="tools">${pos>0?`<button data-favup="${id}">Mettre en avant</button>`:""}<button data-favdel="${id}">Retirer</button></div>`:""}</div>`}
+  ${hofEdit?`<div class="tools"><div class="mv">${pos>0?`<button data-favmv="${id}" data-dir="-1" aria-label="Avancer">◀</button>`:""}${pos<favs().length-1?`<button data-favmv="${id}" data-dir="1" aria-label="Reculer">▶</button>`:""}</div><button data-favdel="${id}">Retirer</button></div>`:""}</div>`}
 function renderProfile(){
   const ids=Object.keys(db);let songs=0,tot=0,comp=0;const rc=[0,0,0,0,0],artistsSet=new Set();
   ids.forEach(id=>{const d=db[id];songs+=d.got.length;tot+=d.tracks.length;if(isComplete(d))comp++;artistsSet.add(d.artist);d.got.forEach(i=>rc[rar(d.sc&&d.sc[i]||0,SONG_T)]++)});
@@ -1060,7 +1062,7 @@ function renderProfile(){
   <details class="plpanel gradebox" style="margin-top:16px"><summary>Les grades et les paliers</summary>
     <div class="helpbox" style="margin-top:8px">Ton <b>grade</b> dépend du nombre de <b>chansons différentes</b> que tu as débloquées : les doublons ne comptent pas. ${totalSongs?`Le jeu contient environ <b>${totalSongs.toLocaleString("fr-FR")} chansons</b>.`:""}</div>
     ${RANKS.map((r,i)=>`<div class="grow ${songs>=r[0]?"done":""} ${i==ri?"now":""}"><span class="dot">${songs>=r[0]?"✓":""}</span><b>${r[1]}</b><span>${r[0]?r[0].toLocaleString("fr-FR")+" chansons":"au départ"}</span></div>`).join("")}
-    <div class="helpbox"><b>Les certifications</b> (disques Bronze à Platine) comptent combien de chansons de chaque rareté tu possèdes. La rareté d’une chanson vient de ses streams Spotify cumulés.<br><br><b>Le Hall of Fame</b> expose jusqu’à ${MAXFAV} albums que tu as <b>complétés</b> (toutes les chansons trouvées). Le premier est ton n°1, mis en avant.<br><br><b>Les pièces :</b> un CD coûte ${PRICE} pièces. Tu en gagnes avec le temps (+${REGEN_COINS} toutes les ${REGEN_MS/60000} minutes, jusqu’à ${MAXFREE}), avec les doublons et en complétant un album.</div>
+    <div class="helpbox"><b>Les certifications</b> (disques Bronze à Platine) comptent combien de chansons de chaque rareté tu possèdes. La rareté d’une chanson vient de ses streams Spotify cumulés.<br><br><b>Le Hall of Fame</b> expose jusqu’à ${MAXFAV} albums que tu as <b>complétés</b> (toutes les chansons trouvées). Le premier est ton n°1, mis en avant : « Organiser » te laisse changer l’ordre avec les flèches.<br><br><b>Les pièces :</b> un CD coûte ${PRICE} pièces. Tu en gagnes avec le temps (+${REGEN_COINS} toutes les ${REGEN_MS/60000} minutes, jusqu’à ${MAXFREE}), avec les doublons et en complétant un album.</div>
   </details>
   <h2>Mes certifications</h2>
   <div class="certs">${RN.map((n,i)=>`<div class="cert r${i}"><i></i><b>${rc[i]}</b>${n}</div>`).join("")}</div>
@@ -1513,12 +1515,13 @@ app.addEventListener("click",e=>{
     return}
   const so=e.target.closest("[data-sort]");
   if(so){const k=so.dataset.sort;albSort=albSort.k==k?{k,dir:-albSort.dir}:{k,dir:1};st("popdex_sort",albSort);const ids=Object.keys(db);if(window._drawAlb)window._drawAlb();if(k=="color")analyseColors(ids);return}
-  const f=e.target.closest("[data-fav],[data-favadd],[data-favdel],[data-favup],[data-edit],[data-picker],[data-name],[data-nameok]");
+  const f=e.target.closest("[data-fav],[data-favadd],[data-favdel],[data-favup],[data-favmv],[data-edit],[data-picker],[data-name],[data-nameok]");
   if(f){
     const D=f.dataset;meta.fav=meta.fav||[];
     if(D.fav){const i=meta.fav.indexOf(D.fav);if(i>=0)meta.fav.splice(i,1);else if(meta.fav.length<MAXFAV)meta.fav.push(D.fav);else return;save();renderColl();return}
     if(D.favadd){if(meta.fav.length<MAXFAV&&!meta.fav.includes(D.favadd))meta.fav.push(D.favadd);save();renderProfile();return}
     if(D.favdel){meta.fav=meta.fav.filter(x=>x!=D.favdel);save();renderProfile();return}
+    if(D.favmv){const fv=favs(),i=fv.indexOf(D.favmv),j=i+(+D.dir);if(i>=0&&j>=0&&j<fv.length){const a=meta.fav.indexOf(fv[i]),b=meta.fav.indexOf(fv[j]);[meta.fav[a],meta.fav[b]]=[meta.fav[b],meta.fav[a]];save();renderProfile()}return}
     if(D.favup){meta.fav=[D.favup].concat(meta.fav.filter(x=>x!=D.favup));save();renderProfile();window.scrollTo(0,0);return}
     if(D.edit){hofEdit=!hofEdit;renderProfile();return}
     if(D.picker){hofPick=!hofPick;renderProfile();return}
